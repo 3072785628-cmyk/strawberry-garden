@@ -1817,6 +1817,191 @@
     padding: 10px !important;
   }
 }
+/* ===== 监控窗口最终版：尺寸 + 横栏配色 + 去提示字 ===== */
+
+/* 弹窗背景 */
+#cameraModal {
+  padding: 56px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: auto !important;
+  background: rgba(30, 45, 40, 0.72) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* 电脑端窗口尺寸：不要铺满，四周露出暗边 */
+.camera-window {
+  width: min(64vw, 680px) !important;
+  height: min(58vh, 460px) !important;
+  max-width: 680px !important;
+  max-height: 460px !important;
+  background: rgba(247, 243, 238, 0.97) !important;
+  border: 7px solid rgba(241, 236, 231, 0.98) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 顶部横栏：改成截图那种灰绿色 */
+.camera-window-bar {
+  height: 36px !important;
+  flex: 0 0 36px !important;
+  background: #8f9d93 !important;
+  border: 2px solid rgba(73, 84, 78, 0.82) !important;
+  border-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 6px 0 12px !important;
+  color: rgba(38, 51, 47, 0.86) !important;
+}
+
+/* 顶部文字 */
+.camera-bar-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 13px !important;
+  letter-spacing: 0.04em !important;
+  font-weight: 500 !important;
+}
+
+/* 横栏文字颜色 */
+.camera-title,
+.camera-status,
+.camera-time {
+  color: #5b6a62 !important;
+  text-shadow: none !important;
+}
+
+/* 红点闪烁 */
+.camera-dot {
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  background: #f25a22 !important;
+  box-shadow: 0 0 10px rgba(242, 90, 34, 0.7) !important;
+  animation: cameraDotBlink 1s ease-in-out infinite !important;
+}
+
+/* 关闭按钮 */
+.camera-close {
+  width: 30px !important;
+  height: 30px !important;
+  border: 2px solid rgba(73, 84, 78, 0.82) !important;
+  background: #e9b6ae !important;
+  color: #5b6a62 !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  cursor: var(--cursor-pointer) !important;
+}
+
+/* 画面区域 */
+.camera-screen {
+  flex: 1 !important;
+  min-height: 0 !important;
+  padding: 14px !important;
+  overflow: hidden !important;
+  background: rgba(255, 255, 255, 0.52) !important;
+  border: 2px solid rgba(73, 84, 78, 0.82) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 照片完整显示，不要被放大裁切 */
+.camera-screen img,
+#cameraImage {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  cursor: var(--cursor-pointer) !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  outline: none !important;
+  border: 0 !important;
+  touch-action: manipulation !important;
+}
+
+#cameraImage:focus,
+#cameraImage:active,
+.camera-screen:focus,
+.camera-screen:active {
+  outline: none !important;
+  background: transparent !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 去掉“点击画面切换下一张记录”那句 */
+.camera-hint {
+  display: none !important;
+}
+
+/* iPad / 平板：再收一点，避免看不到上栏 */
+@media (min-width: 701px) and (max-width: 1100px) {
+  #cameraModal {
+    padding: 62px 42px !important;
+  }
+
+  .camera-window {
+    width: min(68vw, 560px) !important;
+    height: min(52vh, 380px) !important;
+    max-width: 560px !important;
+    max-height: 380px !important;
+    border-width: 7px !important;
+  }
+
+  .camera-screen {
+    padding: 12px !important;
+  }
+}
+
+/* 手机端：保持你说的正常尺寸，只微调横栏和去蓝色 */
+@media (max-width: 700px) {
+  #cameraModal {
+    padding: 24px !important;
+  }
+
+  .camera-window {
+    width: 88vw !important;
+    height: 62vh !important;
+    max-height: 500px !important;
+    border-width: 6px !important;
+  }
+
+  .camera-window-bar {
+    height: 34px !important;
+    flex: 0 0 34px !important;
+    padding: 0 5px 0 10px !important;
+  }
+
+  .camera-bar-left {
+    gap: 4px !important;
+    font-size: 10px !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .camera-dot {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .camera-close {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 19px !important;
+  }
+
+  .camera-screen {
+    padding: 10px !important;
+  }
+}
   </style>
 </head>
 
