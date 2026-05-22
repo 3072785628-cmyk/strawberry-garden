@@ -21,8 +21,8 @@
       --paper: rgba(246, 239, 235, 0.86);
       --ink: #26332f;
       --muted: rgba(38, 51, 47, 0.62);
-      --cursor: url("strawberry-cursor.png") 2 2, auto;
-      --cursor-pointer: url("strawberry-cursor.png") 2 2, pointer;
+      --cursor: url("images/strawberry-cursor.png") 2 2, auto;
+      --cursor-pointer: url("images/strawberry-cursor.png") 2 2, pointer;
     }
 
     html,
@@ -953,7 +953,7 @@
       position: fixed;
       right: 18px;
       bottom: 18px;
-      z-index: 30;
+      z-index: 120;
       width: 176px;
       padding: 11px 12px 10px;
       border-radius: 16px;
@@ -963,7 +963,7 @@
       color: rgba(255, 250, 250, 0.96);
       font-size: 11px;
       letter-spacing: 0.08em;
-      pointer-events: none;
+      pointer-events: auto;
     }
 
     .session-window .session-title {
@@ -976,13 +976,36 @@
       opacity: 0.86;
     }
 
-    .session-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: rgba(255, 235, 236, 0.95);
-      box-shadow: 0 0 10px rgba(255, 235, 236, 0.9);
-      animation: recordBlink 1.4s ease-in-out infinite;
+ .session-dot {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  padding: 0;
+  margin: -9px -8px -9px 0;
+  background: transparent;
+  border-radius: 50%;
+  cursor: var(--cursor-pointer);
+  z-index: 999;
+}
+
+.session-dot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 235, 236, 0.95);
+  box-shadow: 0 0 10px rgba(255, 235, 236, 0.9);
+  animation: recordBlink 1.4s ease-in-out infinite;
+}
+
+    .session-dot:focus-visible {
+      outline: 1px solid rgba(255,255,255,0.86);
+      outline-offset: 3px;
     }
 
     @keyframes recordBlink {
@@ -1087,7 +1110,225 @@
         max-height: none;
       }
     }
-  .strawberry-record-page {
+
+.camera-card {
+  width: min(96vw, 780px);
+  height: min(86vh, 720px);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+  position: relative;
+}
+
+#cameraModal {
+  background: rgba(30, 45, 40, 0.68);
+  backdrop-filter: blur(8px);
+}
+
+.camera-card .window-head {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  z-index: 20;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.camera-card .window-title {
+  display: none;
+}
+
+.camera-card .window-close {
+  width: 34px;
+  height: 34px;
+  background: rgba(246,239,235,0.72);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+.camera-photo-list {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+}
+
+.camera-photo-list img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(78vw, 430px);
+  max-height: min(68vh, 470px);
+  object-fit: contain;
+  display: block;
+  border-radius: 18px;
+  border: 1px solid rgba(246,239,235,0.58);
+  background: rgba(246,239,235,0.72);
+  box-shadow:
+    0 22px 58px rgba(0,0,0,0.34),
+    0 0 0 1px rgba(255,255,255,0.16);
+  opacity: 0;
+  transform-origin: center;
+  pointer-events: auto;
+}
+
+/* 第一张：先跳出来，偏左偏上 */
+#cameraModal.active .camera-photo-list img:nth-child(1) {
+  z-index: 1;
+  animation: cameraPhotoOne 560ms cubic-bezier(.2, .9, .22, 1.18) 120ms forwards;
+}
+
+/* 第二张：第二个跳出来，偏右一点 */
+#cameraModal.active .camera-photo-list img:nth-child(2) {
+  z-index: 2;
+  animation: cameraPhotoTwo 560ms cubic-bezier(.2, .9, .22, 1.18) 850ms forwards;
+}
+
+/* 第三张：最后跳出来，压在最中间 */
+#cameraModal.active .camera-photo-list img:nth-child(3) {
+  z-index: 3;
+  animation: cameraPhotoThree 620ms cubic-bezier(.2, .9, .22, 1.18) 1580ms forwards;
+}
+
+@keyframes cameraPhotoOne {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
+    filter: blur(2px);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-66%, -56%) scale(1.04) rotate(-8deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-66%, -56%) scale(1) rotate(-7deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes cameraPhotoTwo {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
+    filter: blur(2px);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-36%, -43%) scale(1.04) rotate(6deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-36%, -43%) scale(1) rotate(5deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes cameraPhotoThree {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
+    filter: blur(2px);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -49%) scale(1.08) rotate(-1deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -49%) scale(1.03) rotate(-1deg);
+    filter: blur(0);
+  }
+}
+
+.camera-photo-list img:hover {
+  z-index: 10;
+  transform: translate(-50%, -50%) scale(1.06) rotate(0deg) !important;
+  transition: transform 220ms ease;
+}
+
+@media (max-width: 700px) {
+  .camera-card {
+    width: 96vw;
+    height: 84vh;
+  }
+
+  .camera-photo-list img {
+    width: min(84vw, 350px);
+    max-height: 58vh;
+  }
+
+  @keyframes cameraPhotoOne {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
+      filter: blur(2px);
+    }
+    70% {
+      opacity: 1;
+      transform: translate(-60%, -58%) scale(1.04) rotate(-7deg);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-60%, -58%) scale(1) rotate(-6deg);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes cameraPhotoTwo {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
+      filter: blur(2px);
+    }
+    70% {
+      opacity: 1;
+      transform: translate(-40%, -44%) scale(1.04) rotate(5deg);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-40%, -44%) scale(1) rotate(5deg);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes cameraPhotoThree {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
+      filter: blur(2px);
+    }
+    70% {
+      opacity: 1;
+      transform: translate(-50%, -48%) scale(1.08) rotate(-1deg);
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -48%) scale(1.03) rotate(-1deg);
+      filter: blur(0);
+    }
+  }
+}
+.diary-read-image {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  display: none;
+  margin-bottom: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(45,64,58,0.12);
+  background: rgba(255,255,255,0.28);
+}
+
+.strawberry-record-page {
   padding: 0;
   overflow: hidden;
 }
@@ -1181,6 +1422,7 @@
 </head>
 
 <body>
+  <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
   <main class="app">
     <div class="soft-noise"></div>
 
@@ -1234,7 +1476,7 @@
         <div class="paper-card content-body fangmei-profile">
           <div>
             <div class="avatar-box">
-              <img src="fangmei-photo.jpg" alt="方莓照片" />
+              <img src="images/fangmei-photo.jpg" alt="方莓照片" />
             </div>
           </div>
 
@@ -1389,7 +1631,7 @@
                   <span class="memo-tag">MEMO 01</span>
                   <h3>关于海豹</h3>
                   <div class="memo-photo">
-                    <img src="memo-seal.jpg" alt="海豹配图" />
+                    <img src="images/memo-seal.jpg" alt="海豹配图" />
                   </div>
                   <div class="memo-copy">
                     <p><span class="memo-trigger" data-flip-target>方老师</span>睡觉特别喜欢抱那只海豹。</p>
@@ -1427,7 +1669,7 @@
                   <span class="memo-tag">MEMO 02</span>
                   <h3>关于乔迁礼</h3>
                   <div class="memo-photo">
-                    <img src="memo-necklace.jpg" alt="项链配图" />
+                    <img src="images/memo-necklace.jpg" alt="项链配图" />
                   </div>
                   <div class="memo-copy">
                     <p><span class="memo-trigger" data-flip-target>方老师</span>送锁骨链的时候，先提醒我别太高兴。</p>
@@ -1615,13 +1857,27 @@
     <div class="session-window" aria-hidden="true">
       <div class="session-title">
         <span>SESSION RECORD</span>
-        <span class="session-dot"></span>
+        <button class="session-dot" id="sessionCamera" type="button" title="camera"></button>
       </div>
       <div class="session-row"><span>停留</span><strong id="sessionTime">00:00:00</strong></div>
       <div class="session-row"><span>页面</span><strong id="sessionPage">暗号</strong></div>
       <div class="session-row"><span>状态</span><strong>记录中</strong></div>
     </div>
   </main>
+<div class="modal-mask" id="cameraModal">
+  <div class="modal-card camera-card">
+    <div class="window-head">
+      <span class="window-title">CAMERA / PRIVATE</span>
+      <button class="window-close" data-close="cameraModal" type="button">×</button>
+    </div>
+
+   <div class="camera-photo-list">
+  <img src="images/camera-1.jpg" alt="记录照片一">
+  <img src="images/camera-2.jpg" alt="记录照片二">
+  <img src="images/camera-3.jpg" alt="记录照片三">
+</div>
+  </div>
+</div>
 <div class="modal-mask" id="strawberryRecordModal">
   <div class="modal-card strawberry-detail-card">
     <div class="window-head">
@@ -1646,6 +1902,7 @@
   <div class="modal-mask" id="diaryReadModal">
     <div class="modal-card diary-main-card">
       <div class="window-head"><span class="window-title" id="diaryReadTitle">DIARY</span><button class="window-close" id="closeDiaryRead" type="button">×</button></div>
+      <img id="diaryReadImage" class="diary-read-image" alt="">
       <div class="strawberry-detail-text" id="diaryReadText"></div>
     </div>
   </div>
@@ -1718,7 +1975,7 @@
         <span>2026.5.20</span>
       </div>
       <div class="phone-screen">
-        <img src="search-record.jpg" alt="张平手机搜索记录" />
+        <img src="images/search-record.jpg" alt="张平手机搜索记录" />
       </div>
       <p class="phone-caption">
         <strong>SEARCH HISTORY</strong><br />来源：记录人手机。状态：未归档。该截图被暂存于草莓园隐藏入口。
@@ -1733,6 +1990,18 @@
 
   <script>
     const PASSWORD = "00022414";
+    const bgm = document.querySelector("#bgm");
+    let bgmStarted = false;
+
+    function startBgm() {
+      if (!bgm || bgmStarted) return;
+      bgm.volume = 0.35;
+      bgm.play().then(() => {
+        bgmStarted = true;
+      }).catch(() => {
+        console.log("音乐需要用户点击后播放");
+      });
+    }
 
     const pages = document.querySelectorAll(".page");
     const passwordInput = document.querySelector("#passwordInput");
@@ -1775,6 +2044,7 @@
     function checkPassword() {
       if (passwordInput.value.trim() === PASSWORD) {
         errorText.textContent = "";
+        startBgm();
         showPage("enterPage");
       } else {
         errorText.textContent = "暗号不对。";
@@ -1859,7 +2129,7 @@
 
 高潮次数：3次
 
-身体反应：阴道收缩频率：入体后每5-8次抽插一次痉挛，高潮前每2-3次强烈收缩；颈侧重压时脸颊泛红、呼吸停顿明显，小腹颤动剧烈，指甲在我后背留痕。`
+身体反应：*阴道收缩频率：入体后每5-8次抽插一次痉挛，高潮前每2-3次强烈收缩；颈侧重压时脸颊泛红、呼吸停顿明显，小腹颤动剧烈，指甲在我后背留痕。`
   },
   5: {
     title: "STRAWBERRY / 05",
@@ -1943,8 +2213,9 @@ document.querySelector("#closeStrawberryFinal").addEventListener("click", () => 
     
     const diaryRecords = {
       1: {
-        title: "X年X月X日",
-        text: `她把发圈落在了我这里。
+  title: "X年X月X日",
+  image: "images/diary-hairtie.jpg",
+  text: `她把发圈落在了我这里。
 黑色的，很普通。
 外面包着布，用久了有一点松，内侧缠着一根很细的黑发。
 它落在洗手台右侧，旁边有一小圈水渍。
@@ -2015,16 +2286,41 @@ document.querySelector("#closeStrawberryFinal").addEventListener("click", () => 
 这句话没什么特别。
 可她说出来的时候，眼睛很亮。
 那只小猫又往前走了几步，踩到一小块湿泥，爪子陷进去，拔出来的时候晃了一下。
-方莓笑了，眼睛弯弯的，格外漂亮，
-她说：“它好像在出航。”
-我低头看那只小猫。
-一只还没我手掌大的猫，站在树影和泥地之间，确实有一点像要去什么地方。
-只是它太小，走得太慢，连那片落叶都像一阵风暴。
-“那给它取个名字？”我问。
-她想了一会儿。
-“幸运号吧。”
-幸运号，像一艘船。
-也像她把一点很笨的祝福放到那只猫身上，希望它能从这片灌木、泥地、夏天的热风和不知道什么时候会来的坏天气里活下去。`
+好可爱。
+我突然想到：“叫小莓怎么样？”
+方莓立刻抬头看我。“不要。”
+她拒绝得很坚决。
+“为什么？”
+她皱了一下眉，像觉得这个问题很莫名其妙：“和我一样的名字会变得很倒霉。”
+她说得太自然了，自然到这似乎不像是一句玩笑，她把自己的名字放在那只小猫身上，第一反应不是纪念，是担心小猫会倒霉。
+我看着她。
+她大概没觉得自己说了什么奇怪的话，还在低头看那只小猫。
+它正努力越过一片落叶，走得很慢，像一艘太小的船，硬要从风浪里开出去。
+我说：“那叫幸运号吧。”
+她愣了一下：“什么？”
+“幸运号。”我说，“像船。”
+她看向那只猫，又看我。
+我继续说：“还因为我自从遇见某人之后，就变得很幸运了。”
+“是吗？”她突然站起身，“我们去买点猫粮吧。”
+我们去买了一小袋猫粮。
+她看配料表看得很认真，比给自己买吃的认真许多。
+回到公园的时候，幸运号还在。
+方莓把猫粮倒在纸巾上，母猫先凑近闻了闻，小猫后面才凑过去。
+幸运号吃得很慢，鼻尖沾了一点碎屑。
+方莓看着它，忽然说：“它会不会记得我？”
+我说：“会。”
+她没有立刻接话。
+过了一会儿，她说：“猫哪有这么聪明。”
+我说：“幸运号随小莓会比较聪明。”
+回去的路上，她拎着剩下的猫粮，袋子轻轻地晃啊晃，“下次，我们再来看它吧。”
+下次。
+晚上回家以后，我查了附近几家宠物店的配送时间，猫粮，益生菌，不容易被雨泡坏的小纸箱。
+下单前，我停了一会儿。
+这不在原来的计划里。
+原来的计划到她心软、放松、愿意和我继续待一会儿为止，就够了。
+可幸运号已经有名字了。
+有名字的东西，很难再被当成普通节点处理。
+我写下这行字时，突然又想起被写在档案上的方老师的名字。`
       },
       3: {
         title: "X年X月X日",
@@ -2062,23 +2358,88 @@ document.querySelector("#closeStrawberryFinal").addEventListener("click", () => 
     const diaryReadModal = document.querySelector("#diaryReadModal");
     const diaryReadTitle = document.querySelector("#diaryReadTitle");
     const diaryReadText = document.querySelector("#diaryReadText");
+    const diaryReadImage = document.querySelector("#diaryReadImage");
+
+    let diaryChaosTimer = null;
+    let diaryChaosStarted = false;
+    let diaryChaosScrollHandler = null;
+
+    function resetDiaryChaosWait() {
+      if (diaryChaosTimer) {
+        clearTimeout(diaryChaosTimer);
+        diaryChaosTimer = null;
+      }
+
+      diaryChaosStarted = false;
+
+      const diaryReadCard = diaryReadModal?.querySelector(".diary-main-card");
+      if (diaryReadCard && diaryChaosScrollHandler) {
+        diaryReadCard.removeEventListener("scroll", diaryChaosScrollHandler);
+      }
+
+      diaryChaosScrollHandler = null;
+    }
+
+    function initDiaryChaosAfterScroll() {
+      resetDiaryChaosWait();
+
+      const diaryReadCard = diaryReadModal.querySelector(".diary-main-card");
+      if (!diaryReadCard) return;
+
+      diaryReadCard.scrollTop = 0;
+
+      const checkBottom = () => {
+        const nearBottom =
+          diaryReadCard.scrollTop + diaryReadCard.clientHeight >= diaryReadCard.scrollHeight - 12;
+
+        if (nearBottom && !diaryChaosTimer && !diaryChaosStarted) {
+          diaryChaosTimer = setTimeout(() => {
+            diaryChaosStarted = true;
+            startDiaryChaos();
+          }, 3500);
+        }
+
+        if (!nearBottom && diaryChaosTimer && !diaryChaosStarted) {
+          clearTimeout(diaryChaosTimer);
+          diaryChaosTimer = null;
+        }
+      };
+
+      diaryChaosScrollHandler = checkBottom;
+      diaryReadCard.addEventListener("scroll", checkBottom, { passive: true });
+
+      setTimeout(checkBottom, 120);
+    }
 
     document.querySelectorAll("[data-diary]").forEach((button) => {
       button.addEventListener("click", () => {
         const diary = diaryRecords[button.dataset.diary];
         if (!diary) return;
+
+        resetDiaryChaosWait();
+
         diaryReadTitle.textContent = diary.title;
         diaryReadText.textContent = diary.text;
+
+        if (diary.image) {
+          diaryReadImage.src = diary.image;
+          diaryReadImage.style.display = "block";
+        } else {
+          diaryReadImage.removeAttribute("src");
+          diaryReadImage.style.display = "none";
+        }
+
         diaryReadModal.classList.add("active");
 
         if (button.dataset.diary === "3") {
-          setTimeout(startDiaryChaos, 900);
+          setTimeout(initDiaryChaosAfterScroll, 120);
         }
       });
     });
 
     document.querySelector("#closeDiaryRead").addEventListener("click", () => {
       diaryReadModal.classList.remove("active");
+      resetDiaryChaosWait();
     });
 
     const diaryLargeModal = document.querySelector("#diaryLargeModal");
@@ -2104,7 +2465,16 @@ document.querySelector("#closeStrawberryFinal").addEventListener("click", () => 
       lockMessage.classList.add("active");
       document.querySelector("#chaosFinal").classList.add("active");
     });
+  const sessionCamera = document.querySelector("#sessionCamera");
+const cameraModal = document.querySelector("#cameraModal");
 
+if (sessionCamera && cameraModal) {
+  sessionCamera.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    cameraModal.classList.add("active");
+  });
+}
     document.querySelector("#secretTriggerOne").addEventListener("click", () => {
       document.querySelector("#secretModalOne").classList.add("active");
     });
