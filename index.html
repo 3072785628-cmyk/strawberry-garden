@@ -1728,6 +1728,95 @@
     padding: 12px;
   }
 }
+  /* ===== 监控窗口最终尺寸修正版：iPad/电脑不要过大 ===== */
+#cameraModal {
+  padding: 34px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: auto !important;
+}
+
+.camera-window {
+  width: min(78vw, 760px) !important;
+  height: min(64vh, 520px) !important;
+  max-width: 760px !important;
+  max-height: 520px !important;
+  border-width: 8px !important;
+}
+
+.camera-window-bar {
+  height: 38px !important;
+  flex: 0 0 38px !important;
+}
+
+.camera-bar-left {
+  font-size: 14px !important;
+  gap: 6px !important;
+}
+
+.camera-dot {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+.camera-screen {
+  flex: 1 !important;
+  min-height: 0 !important;
+  padding: 16px !important;
+  overflow: hidden !important;
+}
+
+.camera-screen img,
+#cameraImage {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* iPad 这类中等屏幕再收一点 */
+@media (min-width: 701px) and (max-width: 1100px) {
+  .camera-window {
+    width: 76vw !important;
+    height: 58vh !important;
+    max-width: 700px !important;
+    max-height: 470px !important;
+  }
+
+  .camera-screen {
+    padding: 14px !important;
+  }
+}
+
+/* 手机端保持相对大一点，但保证上栏露出来 */
+@media (max-width: 700px) {
+  #cameraModal {
+    padding: 22px !important;
+  }
+
+  .camera-window {
+    width: 90vw !important;
+    height: 66vh !important;
+    max-height: 560px !important;
+    border-width: 7px !important;
+  }
+
+  .camera-window-bar {
+    height: 36px !important;
+    flex: 0 0 36px !important;
+  }
+
+  .camera-bar-left {
+    font-size: 11px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .camera-screen {
+    padding: 10px !important;
+  }
+}
   </style>
 </head>
 
@@ -2943,6 +3032,81 @@ setInterval(() => {
     monitorLiveTimeFinal.textContent = sessionTime.textContent;
   }
 }, 1000);
+  /* ===== 监控照片切换最终修正版 ===== */
+window.cameraPhotoListFinal = [
+  "camera-1.jpg",
+  "camera-2.jpg",
+  "camera-3.jpg"
+];
+
+window.cameraPhotoIndexFinal = 0;
+
+window.nextCameraPhotoFinal = function () {
+  const img = document.querySelector("#cameraImage");
+  if (!img) return;
+
+  window.cameraPhotoIndexFinal =
+    (window.cameraPhotoIndexFinal + 1) % window.cameraPhotoListFinal.length;
+
+  img.style.animation = "none";
+  img.offsetHeight;
+  img.src = window.cameraPhotoListFinal[window.cameraPhotoIndexFinal];
+  img.style.animation = "";
+};
+
+window.openCameraFinal = function () {
+  const modal = document.querySelector("#cameraModal");
+  const img = document.querySelector("#cameraImage");
+  const liveTime = document.querySelector("#cameraLiveTime");
+  const sessionTimeNow = document.querySelector("#sessionTime");
+
+  window.cameraPhotoIndexFinal = 0;
+
+  if (img) {
+    img.src = window.cameraPhotoListFinal[0];
+    img.onclick = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      window.nextCameraPhotoFinal();
+    };
+  }
+
+  if (liveTime && sessionTimeNow) {
+    liveTime.textContent = sessionTimeNow.textContent;
+  }
+
+  if (modal) {
+    modal.classList.add("active");
+  }
+};
+
+const cameraButtonFinalFix = document.querySelector("#sessionCamera");
+if (cameraButtonFinalFix) {
+  cameraButtonFinalFix.onclick = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    window.openCameraFinal();
+  };
+}
+
+const cameraImgFinalFix = document.querySelector("#cameraImage");
+if (cameraImgFinalFix) {
+  cameraImgFinalFix.onclick = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    window.nextCameraPhotoFinal();
+  };
+}
+
+const cameraCloseFinalFix = document.querySelector("#cameraClose");
+if (cameraCloseFinalFix) {
+  cameraCloseFinalFix.onclick = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const modal = document.querySelector("#cameraModal");
+    if (modal) modal.classList.remove("active");
+  };
+}
   </script>
 </body>
 </html>
