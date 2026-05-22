@@ -1,0 +1,2650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>草莓园</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --green: #5a7068;
+      --green-dark: #3f554e;
+      --green-deep: #2d403a;
+      --pink: #af8e8f;
+      --paper: rgba(246, 239, 235, 0.86);
+      --ink: #26332f;
+      --muted: rgba(38, 51, 47, 0.62);
+      --cursor: url("strawberry-cursor.png") 2 2, auto;
+      --cursor-pointer: url("strawberry-cursor.png") 2 2, pointer;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--green);
+      color: var(--ink);
+      font-family: "Songti SC", "SimSun", "Microsoft YaHei", serif;
+      overflow-x: hidden;
+      cursor: var(--cursor);
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    button,
+    .primary-button,
+    .ghost-button,
+    .index-button,
+    .diary-entry-button,
+    .window-close,
+    .secret-trigger,
+    .memo-card-inner,
+    .memo-trigger {
+      cursor: var(--cursor-pointer);
+    }
+
+    .app {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255,255,255,0.08), transparent 22%),
+        radial-gradient(circle at 88% 18%, rgba(175,142,143,0.18), transparent 24%),
+        linear-gradient(180deg, var(--green) 0%, var(--green-dark) 100%);
+    }
+
+    .page {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      min-height: 100vh;
+      padding: 28px 22px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+
+    .page.active {
+      position: relative;
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .soft-noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.13;
+      background-image:
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mix-blend-mode: soft-light;
+      z-index: 1;
+    }
+
+    .page-inner {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 430px);
+      min-height: calc(100vh - 56px);
+      margin: 0 auto;
+    }
+
+    .center-layout {
+      display: flex;
+      min-height: calc(100vh - 56px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .paper-card {
+      width: 100%;
+      border-radius: 28px;
+      padding: 26px 22px;
+      background: var(--paper);
+      border: 1px solid rgba(255,255,255,0.36);
+      box-shadow: 0 22px 70px rgba(28, 45, 39, 0.28);
+      backdrop-filter: blur(12px);
+    }
+
+    .en-label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-weight: 400;
+    }
+
+    .title-cn {
+      font-size: 25px;
+      letter-spacing: 0.12em;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .desc {
+      font-size: 13px;
+      line-height: 2;
+      color: var(--muted);
+    }
+
+    .primary-button {
+      margin-top: 24px;
+      width: 100%;
+      height: 44px;
+      border: 0;
+      border-radius: 999px;
+      color: #f8efef;
+      background: var(--green-deep);
+      border: 1px solid rgba(255,255,255,0.28);
+      letter-spacing: 0.18em;
+      font-size: 13px;
+      box-shadow: 0 12px 28px rgba(45,64,58,0.24);
+    }
+
+    .ghost-button {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(246,239,235,0.68);
+      border: 1px solid rgba(255,255,255,0.36);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      color: rgba(246,239,235,0.86);
+    }
+
+    .topbar-title {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      opacity: 0.9;
+    }
+
+    .pink-mark {
+      width: min(58vw, 260px);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto 24px;
+      position: relative;
+      opacity: 0.95;
+    }
+
+    .pink-mark::before,
+    .pink-mark::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 58%;
+      height: 92%;
+      border-radius: 999px;
+      background: var(--pink);
+      transform-origin: center;
+    }
+
+    .pink-mark::before {
+      transform: translate(-56%, -50%) rotate(19deg);
+    }
+
+    .pink-mark::after {
+      transform: translate(-30%, -48%) rotate(21deg);
+      opacity: 0.88;
+    }
+
+    .password-card input {
+      width: 100%;
+      height: 44px;
+      margin-top: 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(45,64,58,0.22);
+      background: rgba(255,255,255,0.54);
+      outline: none;
+      text-align: center;
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .password-card input::placeholder {
+      color: rgba(38,51,47,0.34);
+    }
+
+    .error-text {
+      height: 20px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #8c575c;
+      text-align: center;
+    }
+
+    .enter-card {
+      text-align: center;
+      background: rgba(246,239,235,0.80);
+    }
+
+    .enter-subline {
+      margin: 20px auto 0;
+      width: 1px;
+      height: 52px;
+      background: linear-gradient(180deg, transparent, var(--pink), transparent);
+    }
+
+    .index-header {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto 20px;
+      color: rgba(246,239,235,0.9);
+    }
+
+    .index-header h2 {
+      font-size: 25px;
+      letter-spacing: 0.16em;
+      margin-bottom: 8px;
+    }
+
+    .index-list {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      display: grid;
+      overflow: hidden;
+      border-radius: 30px;
+      background: rgba(246,239,235,0.78);
+      border: 1px solid rgba(255,255,255,0.36);
+      box-shadow: 0 22px 64px rgba(30,45,40,0.18);
+    }
+
+    .index-button {
+      width: 100%;
+      min-height: 88px;
+      padding: 19px 22px;
+      border-radius: 0;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid rgba(45,64,58,0.13);
+      color: var(--ink);
+      text-align: left;
+      transition: background 180ms ease, padding-left 180ms ease;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      align-items: center;
+      column-gap: 12px;
+    }
+
+    .index-button:last-child {
+      border-bottom: 0;
+    }
+
+    .index-button:active {
+      background: rgba(175,142,143,0.16);
+      padding-left: 22px;
+    }
+
+    .index-button .num {
+      grid-row: 1 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(175,142,143,0.18);
+      font-size: 11px;
+      color: var(--pink);
+    }
+
+    .index-button .name {
+      font-size: 17px;
+      letter-spacing: 0.12em;
+      align-self: end;
+    }
+
+    .index-button .hint {
+      display: block;
+      margin-top: 5px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+      align-self: start;
+    }
+
+    .content-title {
+      margin-bottom: 18px;
+      color: rgba(246,239,235,0.93);
+    }
+
+    .content-title h2 {
+      font-size: 24px;
+      letter-spacing: 0.16em;
+      margin-top: 6px;
+    }
+
+    .content-body {
+      font-size: 14px;
+      line-height: 2.05;
+    }
+
+    .content-body p + p {
+      margin-top: 16px;
+    }
+
+    .secret-trigger {
+      position: fixed;
+      z-index: 20;
+      width: 48px;
+      height: 48px;
+      left: 18px;
+      top: 18px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--pink);
+      box-shadow: 0 10px 26px rgba(80,50,56,0.28);
+      color: rgba(255,255,255,0.92);
+      font-size: 18px;
+      opacity: 0.86;
+    }
+
+    .secret-trigger.second {
+      left: auto;
+      right: 18px;
+      top: auto;
+      bottom: 96px;
+      width: 18px;
+      height: 18px;
+      background: rgba(246,239,235,0.62);
+      color: transparent;
+      opacity: 0.42;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(30, 45, 40, 0.55);
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-mask.active {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(92vw, 390px);
+      border-radius: 28px;
+      padding: 25px 22px;
+      background: rgba(246,239,235,0.94);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .modal-card h3 {
+      font-size: 20px;
+      letter-spacing: 0.14em;
+      margin-bottom: 12px;
+    }
+
+    .modal-card p {
+      font-size: 14px;
+      line-height: 2;
+      color: rgba(38,51,47,0.76);
+    }
+
+    .modal-card .ghost-button {
+      margin-top: 20px;
+      background: rgba(90,112,104,0.13);
+    }
+
+    .diary-main-card {
+      width: min(90vw, 720px);
+      max-height: min(82vh, 680px);
+      overflow-y: auto;
+      padding: 30px 30px 32px;
+      border-radius: 26px;
+    }
+
+    .diary-main-card p {
+      font-size: 14px;
+      line-height: 2.1;
+      text-align: left;
+    }
+
+    .fangmei-profile {
+      display: grid;
+      gap: 18px;
+    }
+
+    .avatar-box {
+      width: 138px;
+      height: 205px;
+      margin: 0 auto 4px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 58% 38%, rgba(175,142,143,0.34), transparent 36%),
+        rgba(255,255,255,0.36);
+      border: 1px solid rgba(45,64,58,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: rgba(38,51,47,0.45);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+    }
+
+    .avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .profile-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.30);
+      border: 1px solid rgba(45,64,58,0.08);
+      min-height: 46px;
+      align-items: center;
+    }
+
+    .field-name {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      color: var(--pink);
+    }
+
+    .field-value {
+      font-size: 13px;
+      line-height: 1.75;
+      color: rgba(38,51,47,0.68);
+    }
+
+    .archive-meta {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .profile-section {
+      margin-top: 18px;
+      padding: 16px 15px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.28);
+      border: 1px solid rgba(45,64,58,0.08);
+    }
+
+    .profile-section h3 {
+      margin-bottom: 14px;
+      font-size: 16.5px;
+      letter-spacing: 0.12em;
+      color: var(--pink);
+    }
+
+    .profile-section p,
+    .profile-section li {
+      font-size: 14.5px;
+      line-height: 2.02;
+      color: rgba(38,51,47,0.76);
+    }
+
+    .profile-section ul {
+      list-style: none;
+      display: grid;
+      gap: 7px;
+    }
+
+    .profile-section li strong {
+      color: rgba(38,51,47,0.88);
+      font-weight: 400;
+    }
+
+    .profile-warning {
+      margin-top: 10px;
+      padding-left: 12px;
+      border-left: 2px solid rgba(175,142,143,0.58);
+      color: rgba(38,51,47,0.66);
+    }
+
+    .memo-intro {
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    .memo-page-body {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      padding: 0;
+    }
+
+    .memo-book {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 4px;
+      align-items: stretch;
+    }
+
+    .memo-entry {
+      perspective: 1400px;
+      min-height: 690px;
+      border-radius: 28px;
+      background: rgba(246,239,235,0.26);
+      border: 1px solid rgba(255,255,255,0.26);
+      box-shadow: 0 18px 46px rgba(30,45,40,0.14);
+      padding: 10px;
+    }
+
+    .memo-shell {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: inherit;
+      transform-style: preserve-3d;
+      transition: transform 780ms ease;
+    }
+
+    .memo-entry.flipped .memo-shell {
+      transform: rotateY(180deg);
+    }
+
+    .memo-side {
+      position: absolute;
+      inset: 10px;
+      width: calc(100% - 20px);
+      min-height: calc(100% - 20px);
+      padding: 22px 20px 20px;
+      border-radius: 22px;
+      backface-visibility: hidden;
+      border: 1px solid rgba(45,64,58,0.10);
+      background: rgba(246,239,235,0.70);
+      box-shadow: 0 14px 38px rgba(30,45,40,0.10);
+      overflow-y: auto;
+    }
+
+    .memo-back {
+      transform: rotateY(180deg);
+      background: rgba(175,142,143,0.16);
+      border-color: rgba(175,142,143,0.24);
+    }
+
+    .memo-tag {
+      display: inline-block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--pink);
+    }
+
+    .memo-side h3 {
+      margin-bottom: 14px;
+      font-size: 17px;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+    }
+
+    .memo-photo {
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      border: 1px solid rgba(45,64,58,0.08);
+      background: rgba(255,255,255,0.28);
+    }
+
+    .memo-photo img {
+      width: 100%;
+      display: block;
+      object-fit: contain;
+      max-height: none;
+    }
+
+    .memo-copy p {
+      font-size: 14px;
+      line-height: 2;
+      color: rgba(38,51,47,0.76);
+      margin-bottom: 10px;
+    }
+
+    .memo-copy strong {
+      font-weight: 400;
+      color: rgba(38,51,47,0.92);
+    }
+
+    .memo-trigger {
+      color: inherit;
+      border-bottom: 1px dashed rgba(175,142,143,0.28);
+      padding-bottom: 1px;
+      transition: color 180ms ease, border-color 180ms ease;
+    }
+
+    .memo-trigger:hover {
+      color: var(--pink);
+      border-color: rgba(175,142,143,0.52);
+    }
+
+    .memo-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .memo-card {
+      min-height: 132px;
+      perspective: 1000px;
+    }
+
+    .memo-card-inner {
+      position: relative;
+      width: 100%;
+      min-height: 132px;
+      transition: transform 680ms ease;
+      transform-style: preserve-3d;
+    }
+
+    .memo-card.flipped .memo-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .memo-face {
+      position: absolute;
+      inset: 0;
+      min-height: 132px;
+      padding: 17px 17px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(45,64,58,0.10);
+      background: rgba(255,255,255,0.34);
+      backface-visibility: hidden;
+      overflow: hidden;
+    }
+
+    .memo-face.back {
+      transform: rotateY(180deg);
+      background: rgba(175,142,143,0.18);
+      border-color: rgba(175,142,143,0.26);
+    }
+
+    .memo-date {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      color: var(--pink);
+      margin-bottom: 9px;
+    }
+
+    .memo-text {
+      font-size: 13px;
+      line-height: 1.9;
+      color: rgba(38,51,47,0.76);
+    }
+
+    .memo-flip-hint {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      font-size: 11px;
+      color: rgba(38,51,47,0.42);
+      letter-spacing: 0.12em;
+    }
+
+    .diary-grid {
+      display: grid;
+      gap: 13px;
+    }
+
+    .diary-entry-button {
+      width: 100%;
+      padding: 17px 16px;
+      border: 0;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.32);
+      border: 1px solid rgba(45,64,58,0.10);
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .diary-entry-button strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 15px;
+      letter-spacing: 0.12em;
+      font-weight: 400;
+    }
+
+    .diary-entry-button span {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .chaos-window {
+      position: fixed;
+      z-index: 62;
+      display: none;
+      width: min(84vw, 360px);
+      padding: 14px 15px 15px;
+      border-radius: 18px;
+      background: rgba(246,239,235,0.96);
+      border: 1px solid rgba(255,255,255,0.48);
+      box-shadow: 0 18px 52px rgba(20,28,25,0.25);
+      color: var(--ink);
+      overflow: hidden;
+      animation: popIn 240ms ease forwards;
+    }
+
+    .chaos-window.active {
+      display: block;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .chaos-window.small {
+      width: min(68vw, 260px);
+      padding: 12px 13px;
+      border-radius: 14px;
+      font-size: 12px;
+      line-height: 1.8;
+      background:
+        linear-gradient(180deg, rgba(246,239,235,0.96), rgba(230,221,216,0.96)),
+        repeating-linear-gradient(0deg, rgba(38,51,47,0.08) 0 1px, transparent 1px 4px);
+      border: 1px solid rgba(175,142,143,0.45);
+      box-shadow:
+        0 12px 38px rgba(0,0,0,0.26),
+        0 0 24px rgba(175,142,143,0.20);
+      text-shadow:
+        1px 0 rgba(175,142,143,0.48),
+        -1px 0 rgba(90,112,104,0.32);
+      animation: glitchSmallPop 240ms steps(2, end) forwards, glitchSmallShake 0.36s steps(2, end) 0.24s 4;
+    }
+
+    .chaos-window.small::before {
+      content: "ERROR / LOG / 方莓 / RECORD / 继续观察 / 03:12 / EXIT_DENIED";
+      position: absolute;
+      inset: 0;
+      opacity: 0.08;
+      font-size: 10px;
+      line-height: 1.7;
+      letter-spacing: 0.14em;
+      word-break: break-all;
+      transform: rotate(-10deg) scale(1.25);
+      pointer-events: none;
+    }
+
+    @keyframes glitchSmallPop {
+      0% { opacity: 0; filter: blur(1px) contrast(1.2); }
+      55% { opacity: 1; filter: blur(0) contrast(1.35); }
+      100% { opacity: 1; filter: blur(0) contrast(1); }
+    }
+
+    @keyframes glitchSmallShake {
+      0%, 100% { margin-left: 0; }
+      25% { margin-left: -2px; }
+      50% { margin-left: 2px; }
+      75% { margin-left: -1px; }
+    }
+
+    .chaos-window.glitch-final {
+      z-index: 74;
+      width: min(82vw, 430px);
+      padding: 20px 18px 18px;
+      border-radius: 12px;
+      background:
+        linear-gradient(180deg, rgba(246,239,235,0.96), rgba(224,213,207,0.96)),
+        repeating-linear-gradient(0deg, rgba(38,51,47,0.06) 0 1px, transparent 1px 4px);
+      border: 1px solid rgba(175,142,143,0.58);
+      box-shadow:
+        0 0 0 1px rgba(45,64,58,0.14),
+        0 18px 60px rgba(0,0,0,0.36),
+        0 0 38px rgba(175,142,143,0.34);
+      overflow: hidden;
+      animation: glitchPop 220ms steps(2, end) forwards, glitchShake 0.46s steps(2, end) 0.22s 5;
+    }
+
+    .chaos-window.glitch-final::before {
+      content: "ERROR / ERROR / ERROR / RECORD_LOCKED / 方莓 / 记录 / 退出失败";
+      position: absolute;
+      inset: 0;
+      opacity: 0.08;
+      color: #26332f;
+      font-size: 11px;
+      line-height: 1.8;
+      letter-spacing: 0.18em;
+      word-break: break-all;
+      pointer-events: none;
+      transform: rotate(-8deg) scale(1.2);
+    }
+
+    .chaos-window.glitch-final p {
+      position: relative;
+      z-index: 2;
+      font-size: 14px;
+      line-height: 2;
+      text-shadow: 1px 0 rgba(175,142,143,0.5), -1px 0 rgba(90,112,104,0.35);
+    }
+
+    @keyframes glitchPop {
+      0% { opacity: 0; transform: translate(-50%, -48%) scale(0.98) skewX(0deg); filter: blur(1px); }
+      55% { opacity: 1; transform: translate(-50%, -50%) scale(1.01) skewX(-2deg); filter: blur(0); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1) skewX(0deg); filter: blur(0); }
+    }
+
+    @keyframes glitchShake {
+      0%, 100% { margin-left: 0; filter: contrast(1); }
+      25% { margin-left: -3px; filter: contrast(1.18); }
+      50% { margin-left: 3px; filter: contrast(1.3); }
+      75% { margin-left: -1px; filter: contrast(1.08); }
+    }
+
+    .window-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(45,64,58,0.10);
+    }
+
+    .window-title {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: var(--pink);
+    }
+
+    .window-close {
+      width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(45,64,58,0.10);
+      color: rgba(38,51,47,0.72);
+    }
+
+    .lock-message {
+      position: fixed;
+      z-index: 80;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      width: min(84vw, 340px);
+      padding: 22px 20px;
+      border-radius: 24px;
+      background: rgba(63,85,78,0.96);
+      color: rgba(246,239,235,0.96);
+      text-align: center;
+      box-shadow: 0 25px 90px rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .lock-message.active {
+      display: block;
+    }
+
+    .lock-message strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+      letter-spacing: 0.16em;
+      font-weight: 400;
+    }
+
+    .lock-message span {
+      font-size: 13px;
+      line-height: 1.8;
+      opacity: 0.8;
+    }
+
+    body.locked .page {
+      filter: brightness(0.72) saturate(0.85);
+    }
+
+    .session-window {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 120;
+      width: 176px;
+      padding: 11px 12px 10px;
+      border-radius: 16px;
+      background: rgba(205, 174, 176, 0.52);
+      border: 1px solid rgba(246, 225, 226, 0.46);
+      box-shadow: 0 12px 34px rgba(95, 72, 76, 0.16);
+      color: rgba(255, 250, 250, 0.96);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      pointer-events: auto;
+    }
+
+    .session-window .session-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      opacity: 0.86;
+    }
+
+ .session-dot {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  padding: 0;
+  margin: -9px -8px -9px 0;
+  background: transparent;
+  border-radius: 50%;
+  cursor: var(--cursor-pointer);
+  z-index: 999;
+}
+
+.session-dot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 235, 236, 0.95);
+  box-shadow: 0 0 10px rgba(255, 235, 236, 0.9);
+  animation: recordBlink 1.4s ease-in-out infinite;
+}
+
+    .session-dot:focus-visible {
+      outline: 1px solid rgba(255,255,255,0.86);
+      outline-offset: 3px;
+    }
+
+    @keyframes recordBlink {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 1; }
+    }
+
+    .session-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      line-height: 1.7;
+      opacity: 0.9;
+    }
+
+    .session-row span:first-child {
+      opacity: 0.68;
+    }
+
+    .phone-record-card {
+      width: min(92vw, 390px);
+      border-radius: 30px;
+      padding: 18px;
+      background: rgba(38, 51, 47, 0.88);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.36);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(246,239,235,0.92);
+    }
+
+    .phone-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      opacity: 0.82;
+    }
+
+    .phone-screen {
+      border-radius: 22px;
+      overflow: hidden;
+      background: rgba(246,239,235,0.94);
+      border: 1px solid rgba(255,255,255,0.28);
+    }
+
+    .phone-screen img {
+      width: 100%;
+      display: block;
+    }
+
+    .phone-caption {
+      margin-top: 13px;
+      font-size: 12px;
+      line-height: 1.8;
+      opacity: 0.78;
+    }
+
+    .phone-caption strong {
+      font-weight: 400;
+      color: rgba(255, 221, 224, 0.96);
+    }
+
+    @media (min-width: 700px) {
+      body { background: #40574f; }
+      .app { width: 100%; min-height: 100vh; margin: 0; }
+      .page { padding: 46px 48px; }
+      .page-inner { width: min(100%, 980px); min-height: calc(100vh - 92px); }
+      .center-layout { min-height: calc(100vh - 92px); }
+      .password-card, .enter-card { width: min(520px, 100%); }
+      .index-list, .index-header { max-width: 820px; }
+      .index-button { min-height: 94px; padding: 22px 28px; }
+      .content-body { max-width: 920px; margin: 0 auto; }
+    }
+
+    @media (min-width: 1100px) {
+      .page-inner { width: min(100%, 1120px); }
+      .index-list, .index-header { max-width: 880px; }
+      .paper-card { padding: 34px 32px; }
+      .memo-book { max-width: 1100px; margin-left: auto; margin-right: auto; }
+      .memo-entry { min-height: 720px; }
+    }
+
+    @media (max-width: 700px) {
+      .memo-book {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .memo-entry {
+        min-height: 820px;
+        padding: 8px;
+      }
+
+      .memo-side {
+        inset: 8px;
+        width: calc(100% - 16px);
+        min-height: calc(100% - 16px);
+      }
+
+      .memo-photo img {
+        max-height: none;
+      }
+    }
+
+
+/* ===== 监控窗口最终清理版：无底部空白 / 深绿横栏 / 点击切换 ===== */
+#cameraModal {
+  background: rgba(30, 45, 40, 0.72) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  padding: 28px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: auto !important;
+}
+
+.camera-window {
+  width: min(78vw, 760px) !important;
+  max-width: 760px !important;
+  max-height: 86vh !important;
+  height: auto !important;
+  background: rgba(246, 243, 238, 0.98) !important;
+  border: 7px solid rgba(241, 236, 231, 0.98) !important;
+  box-shadow: 0 24px 74px rgba(0, 0, 0, 0.38) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+}
+
+.camera-window-bar {
+  height: 38px !important;
+  flex: 0 0 38px !important;
+  background: var(--green-dark) !important;
+  border: 2px solid rgba(38, 51, 47, 0.86) !important;
+  border-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 6px 0 14px !important;
+  color: rgba(246, 239, 235, 0.92) !important;
+}
+
+.camera-bar-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+  font-size: 15px !important;
+  letter-spacing: 0.08em !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+
+.camera-title,
+.camera-status,
+.camera-time {
+  color: rgba(246, 239, 235, 0.88) !important;
+  text-shadow: 1px 1px rgba(30, 45, 40, 0.42) !important;
+}
+
+.camera-dot {
+  width: 13px !important;
+  height: 13px !important;
+  flex: 0 0 13px !important;
+  border-radius: 50% !important;
+  background: #f25a22 !important;
+  box-shadow: 0 0 10px rgba(242, 90, 34, 0.82) !important;
+  animation: cameraDotBlink 1s ease-in-out infinite !important;
+}
+
+@keyframes cameraDotBlink {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.86);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.camera-close {
+  width: 31px !important;
+  height: 31px !important;
+  flex: 0 0 31px !important;
+  border: 2px solid rgba(38, 51, 47, 0.86) !important;
+  background: #e9b6ae !important;
+  color: rgba(45, 64, 58, 0.95) !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: var(--cursor-pointer) !important;
+}
+
+.camera-screen {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(86vh - 52px) !important;
+  padding: 10px !important;
+  background: rgba(255, 255, 255, 0.54) !important;
+  border: 2px solid rgba(38, 51, 47, 0.86) !important;
+  overflow: hidden !important;
+  display: block !important;
+}
+
+.camera-screen img,
+#cameraImage {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: calc(86vh - 78px) !important;
+  object-fit: contain !important;
+  display: block !important;
+  cursor: var(--cursor-pointer) !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  outline: none !important;
+  border: 0 !important;
+  touch-action: manipulation !important;
+  animation: cameraImagePop 220ms ease !important;
+}
+
+#cameraImage:focus,
+#cameraImage:active,
+.camera-screen:focus,
+.camera-screen:active {
+  outline: none !important;
+  background: transparent !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.camera-hint {
+  display: none !important;
+}
+
+@keyframes cameraImagePop {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(1px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/* iPad / 平板 */
+@media (min-width: 701px) and (max-width: 1100px) {
+  #cameraModal {
+    padding: 34px !important;
+  }
+
+  .camera-window {
+    width: min(76vw, 660px) !important;
+    max-width: 660px !important;
+    max-height: 82vh !important;
+    border-width: 7px !important;
+  }
+
+  .camera-window-bar {
+    height: 36px !important;
+    flex-basis: 36px !important;
+  }
+
+  .camera-bar-left {
+    font-size: 13px !important;
+    gap: 6px !important;
+  }
+
+  .camera-screen {
+    max-height: calc(82vh - 50px) !important;
+    padding: 9px !important;
+  }
+
+  .camera-screen img,
+  #cameraImage {
+    max-height: calc(82vh - 74px) !important;
+  }
+}
+
+/* 手机端：去掉底部空白，贴近老师截图的比例 */
+@media (max-width: 700px) {
+  #cameraModal {
+    padding: 22px 16px !important;
+    align-items: center !important;
+  }
+
+  .camera-window {
+    width: 88vw !important;
+    max-width: 88vw !important;
+    height: auto !important;
+    max-height: 78vh !important;
+    border-width: 6px !important;
+  }
+
+  .camera-window-bar {
+    height: 34px !important;
+    flex: 0 0 34px !important;
+    padding: 0 5px 0 9px !important;
+  }
+
+  .camera-bar-left {
+    gap: 4px !important;
+    font-size: 10px !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .camera-dot {
+    width: 10px !important;
+    height: 10px !important;
+    flex-basis: 10px !important;
+  }
+
+  .camera-close {
+    width: 28px !important;
+    height: 28px !important;
+    flex-basis: 28px !important;
+    font-size: 19px !important;
+  }
+
+  .camera-screen {
+    padding: 8px !important;
+    max-height: calc(78vh - 46px) !important;
+  }
+
+  .camera-screen img,
+  #cameraImage {
+    max-height: calc(78vh - 64px) !important;
+  }
+}
+
+/* 特别窄的手机：让顶部不挤爆 */
+@media (max-width: 390px) {
+  .camera-bar-left {
+    font-size: 9px !important;
+    gap: 3px !important;
+  }
+
+  .camera-window {
+    width: 90vw !important;
+    max-width: 90vw !important;
+  }
+}
+
+.diary-read-image {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  display: none;
+  margin-bottom: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(45,64,58,0.12);
+  background: rgba(255,255,255,0.28);
+}
+
+.strawberry-record-page {
+  padding: 0;
+  overflow: hidden;
+}
+
+.strawberry-list {
+  display: grid;
+  width: 100%;
+}
+
+.strawberry-row {
+  width: 100%;
+  min-height: 68px;
+  padding: 0 20px;
+  border: 0;
+  border-bottom: 1px solid rgba(45,64,58,0.12);
+  background: rgba(246,239,235,0.56);
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: 54px 1fr 76px;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  transition: background 180ms ease, padding-left 180ms ease;
+}
+
+.strawberry-row:last-child {
+  border-bottom: 0;
+}
+
+.strawberry-row:hover {
+  background: rgba(175,142,143,0.16);
+  padding-left: 24px;
+}
+
+.record-num {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(175,142,143,0.18);
+  color: var(--pink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.record-title {
+  font-size: 15px;
+  letter-spacing: 0.12em;
+}
+
+.record-status {
+  font-size: 11px;
+  color: rgba(38,51,47,0.46);
+  text-align: right;
+}
+
+.strawberry-row.viewed .record-status {
+  color: var(--pink);
+}
+
+.strawberry-detail-card {
+  width: min(88vw, 520px);
+  max-height: min(76vh, 620px);
+  overflow-y: auto;
+}
+
+.strawberry-detail-text {
+  font-size: 14px;
+  line-height: 2.05;
+  color: rgba(38,51,47,0.78);
+  white-space: pre-line;
+}
+
+.strawberry-final-card {
+  text-align: center;
+  width: min(86vw, 380px);
+}
+
+.strawberry-final-card h3 {
+  margin-bottom: 12px;
+  font-size: 21px;
+  letter-spacing: 0.1em;
+}
+
+.strawberry-final-card p {
+  color: var(--muted);
+}
+  
+/* ===== 音乐按钮：给 Safari / iPad 手动开启 ===== */
+.music-button {
+  position: fixed;
+  right: 18px;
+  bottom: 118px;
+  z-index: 140;
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(205, 174, 176, 0.76);
+  color: rgba(255, 250, 250, 0.96);
+  box-shadow: 0 10px 28px rgba(95, 72, 76, 0.18);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  cursor: var(--cursor-pointer);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.music-button.playing {
+  opacity: 0.68;
+}
+
+@media (max-width: 700px) {
+  .music-button {
+    right: 16px;
+    bottom: 112px;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+  <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+  <main class="app">
+   <button id="musicButton" class="music-button" type="button">♪ 开启音乐</button>
+    <div class="soft-noise"></div>
+
+    <section class="page active" id="passwordPage">
+      <div class="page-inner center-layout">
+        <div class="paper-card password-card">
+          <span class="en-label">PRIVATE RECORD</span>
+          <h1 class="title-cn">请输入暗号</h1>
+          <p class="desc">这是一份仅允许被指定对象阅读的私人记录。请确认你知道打开它的方式。</p>
+          <input id="passwordInput" type="password" placeholder="secret code" />
+          <button class="primary-button" id="passwordButton">确认进入</button>
+          <div class="error-text" id="errorText"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="enterPage">
+      <div class="page-inner center-layout">
+        <div class="paper-card enter-card">
+          <div class="pink-mark" aria-hidden="true"></div>
+          <span class="en-label">ZHANG PING / FANG MEI</span>
+          <h1 class="title-cn">私人记录</h1>
+          <p class="desc">一些被保存下来的日常、观察、备忘与无法归类的细节。</p>
+          <div class="enter-subline"></div>
+          <button class="primary-button" data-goto="indexPage">打开目录</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="indexPage">
+      <div class="page-inner">
+        <div class="index-header">
+          <span class="en-label">RECORD INDEX</span>
+          <h2>目录</h2>
+          <p class="desc" style="color: rgba(246,239,235,0.72);">请选择需要查看的记录板块。</p>
+        </div>
+
+        <div class="index-list">
+          <button class="index-button" data-goto="profilePage"><span class="num">01</span><span class="name">档案</span><span class="hint">方莓信息、基础记录与持续观察。</span></button>
+          <button class="index-button" data-goto="memoPage"><span class="num">02</span><span class="name">备忘录</span><span class="hint">随手记。</span></button>
+          <button class="index-button" data-goto="diaryPage"><span class="num">03</span><span class="name">日记</span><span class="hint">三篇。</span></button>
+          <button class="index-button" data-goto="strawberryPage"><span class="num">04</span><span class="name">草莓记录</span><span class="hint">亲密记录板块。</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="profilePage">
+      <div class="page-inner">
+        <div class="topbar"><button class="ghost-button" data-goto="indexPage">返回目录</button><span class="topbar-title">01 / FILE</span></div>
+        <div class="content-title"><span class="en-label">FANG MEI PROFILE</span><h2>方莓档案</h2></div>
+        <div class="paper-card content-body fangmei-profile">
+          <div>
+            <div class="avatar-box">
+              <img src="fangmei-photo.jpg" alt="方莓照片" />
+            </div>
+          </div>
+
+          <div class="archive-meta">
+            <div class="field-row"><span class="field-name">档案编号</span><span class="field-value">008</span></div>
+            <div class="field-row"><span class="field-name">建档时间</span><span class="field-value">第一次遇见后 X年X月X日</span></div>
+            <div class="field-row"><span class="field-name">档案状态</span><span class="field-value">持续更新中</span></div>
+            <div class="field-row"><span class="field-name">初始类型</span><span class="field-value">女性观察样本</span></div>
+            <div class="field-row"><span class="field-name">当前类型</span><span class="field-value">独立目录</span></div>
+            <div class="field-row"><span class="field-name">访问记录</span><span class="field-value">仅记录人</span></div>
+          </div>
+
+          <div class="profile-section">
+            <h3>01｜基础资料</h3>
+            <ul>
+              <li><strong>姓名：</strong>方莓</li>
+              <li><strong>性别：</strong>女</li>
+              <li><strong>年龄：</strong>25</li>
+              <li><strong>职业：</strong>自由职业工作者</li>
+              <li><strong>居住状态：</strong>独居</li>
+              <li><strong>常见活动范围：</strong>住处、便利店、画室、画材店、线上工作平台米画师</li>
+              <li><strong>作息状态：</strong>昼夜不稳定，夜间活跃度较高</li>
+              <li><strong>社交状态：</strong>线下社交频率低，线上交流频率较高</li>
+              <li><strong>精神状态：</strong>疑似长期焦虑，住处内存在相关药物包装，夜间服药频率稳定，睡前存在额外服药行为。具体药名另档记录。</li>
+            </ul>
+          </div>
+
+          <div class="profile-section">
+            <h3>1.1 外貌识别</h3>
+            <ul>
+              <li><strong>头发：</strong>黑色中长发，长度至颈部附近，有刘海。</li>
+              <li><strong>眼睛：</strong>黑色，常被镜片或刘海遮挡。</li>
+              <li><strong>眼镜：</strong>黑框，长期佩戴。</li>
+              <li><strong>面部特征：</strong>黑眼圈、痘印、雀斑。</li>
+              <li><strong>体型：</strong>普通微胖，有小腹，腿部偏粗。</li>
+              <li><strong>胎记：</strong>右侧臀部一处。</li>
+              <li><strong>疤痕：</strong>手腕内侧存在数道泛白旧疤。</li>
+            </ul>
+            <p class="profile-warning">注：以上项目均具备稳定识别价值。记录对象本人评价偏低，不影响识别结果。</p>
+          </div>
+
+          <div class="profile-section">
+            <h3>1.2 性格特征</h3>
+            <ul>
+              <li><strong>社交表现：</strong>内向，有礼貌，面对外貌优越者时音量降低、视线回避频率上升。</li>
+              <li><strong>社交敏感度：</strong>高。在人际关系中过于关注他人态度变化，对朋友认可存在明显需求。常通过过度解释、主动退让、提前迎合来降低被排斥奉献，但亦使对方产生压力感，是人际关系中遭遇反感、反复受挫的重要原因之一。</li>
+              <li><strong>自我评价：</strong>偏低，且已形成稳定认知。</li>
+              <li><strong>情感压迫耐受度：</strong>高。记录对象在遭遇朋友阴阳怪气、不公平对待及情绪性贬低后，常替对方寻找理由，并在短时间内回复关系。对情感霸凌的识别与反抗延迟明显，倾向于以忍耐、原谅、维持现状替代矛盾处理。</li>
+              <li><strong>行动力：</strong>强，说到做到。</li>
+              <li><strong>计划反应：</strong>不喜欢既定计划被打断。计划失效后，情绪波动明显。</li>
+              <li><strong>亲密反应：</strong>面对直白情感表达时，常以玩笑、转移、沉默或否定处理。</li>
+              <li><strong>防御方式：</strong>提前贬低自己，降低他人评价带来的影响。</li>
+            </ul>
+          </div>
+
+          <div class="profile-section">
+            <h3>1.3 兴趣偏好</h3>
+            <ul>
+              <li><strong>颜色：</strong>绿色。</li>
+              <li><strong>爱好：</strong>美少女手办、galgame、音游、画画、恐怖片、动画片。</li>
+              <li><strong>动物：</strong>狗、海豹。</li>
+              <li><strong>风格偏好：</strong>复古、古早。</li>
+              <li><strong>内容偏好：</strong>情感扭曲类恋爱内容，擦边肌肉男相关内容。</li>
+              <li><strong>食物：</strong>兴趣较高。情绪低落时，便利食品与高碳水购买频率上升。</li>
+            </ul>
+          </div>
+
+          <div class="profile-section">
+            <h3>1.4 建档理由</h3>
+            <p>初次接触时，记录对象存在明显异常整理痕迹。开门前停顿时间偏长。衣领与发尾存在短时间内被整理过的痕迹。右手手腕内侧可见新鲜压痕，形状接近绳索勒痕。取餐时回避视线，右手向袖口内收。记录对象试图伪装为普通取餐状态。伪装能力一般。</p>
+            <p class="profile-warning">初始结论：羞耻反应明确，欲望痕迹明确。观察价值：中等偏高。建档：通过。</p>
+          </div>
+
+          <div class="profile-section">
+            <h3>02｜初始建档</h3>
+            <ul>
+              <li><strong>阶段编号：</strong>008-A</li>
+              <li><strong>阶段名称：</strong>未接触初筛</li>
+              <li><strong>时间范围：</strong>第一次外送后至门框设备安装前</li>
+              <li><strong>记录方式：</strong>外送接触观察，基础行为判断</li>
+              <li><strong>记录人情感变量：</strong>无</li>
+            </ul>
+            <p>第一次送达后，记录对象进入观察列表。记录对象不适合直接接近，记录对象对陌生男性存在回避倾向，过快推进会提高警惕。外卖员身份适合保留。</p>
+            <p>已确认内容：取餐时未见同住者活动痕迹，外卖份量多为单人份，外卖接收频率稳定，记录对象独居概率较高。取餐时礼貌程度偏高。欲望痕迹存在，且羞耻反应清晰。自我评价疑似偏低，面对注视时，记录对象优先遮挡自身，而非确认观察者意图。</p>
+            <p class="profile-warning">阶段判断：适合继续观察。</p>
+          </div>
+
+          <div class="profile-section">
+            <h3>03｜资料补全</h3>
+            <ul>
+              <li><strong>阶段编号：</strong>008-B</li>
+              <li><strong>阶段名称：</strong>非接触资料补全</li>
+              <li><strong>时间范围：</strong>第二次外送后至第一次性关系前后</li>
+              <li><strong>记录方式：</strong>门框摄像头，室内收音，屏幕内容</li>
+              <li><strong>记录人情感变量：</strong>无</li>
+            </ul>
+            <p>第二次送达后，门框处完成微型摄像设备安装。该设备记录范围有限，但足够确认出入时间、开门前动作、外卖频率、夜间活动规律及部分情绪低落后的购买倾向。第一次性关系后，记录对象昏睡时间较长。室内监控设备于该时段完成补全。</p>
+            <p>该阶段确认内容：记录对象独处时语爱自言自语，唱歌。存在大量自慰行为。疑似有M倾向。存在绳缚尝试。存在大量性欲。对肌肉男素材存在停留与回看行为，可利用肌肉和脸色诱。</p>
+            <p class="profile-warning">阶段判断：记录对象反应系统较完整，观察价值上调。</p>
+          </div>
+
+          <div class="profile-section">
+            <h3>04｜接触</h3>
+            <ul>
+              <li><strong>阶段编号：</strong>008-C</li>
+              <li><strong>阶段名称：</strong>已接触</li>
+              <li><strong>阶段状态：</strong>已与记录对象建立关系</li>
+              <li><strong>时间范围：</strong>第一次性关系后三天至关系建立初期</li>
+              <li><strong>记录方式：</strong>线下接触，诱导方案，反应校验</li>
+              <li><strong>记录人情感变量：</strong>无</li>
+            </ul>
+            <p>记录对象不适合强推进。直接赞美、明确追求、过早定义关系，均可能被记录对象处理为误会、玩笑、短期兴趣或审美异常。有效方式为：给予合理理由以及利用色相。</p>
+            <p>已执行方案：画室模特身份色诱，已成功。画材店附近低频出现。以人体参考需求为接触理由。保留记录对象主动选择的表象。通过饮食、顺路、临时协助等方式增加接触频率。</p>
+          </div>
+
+          <div class="profile-section">
+            <h3>05｜当前档案</h3>
+            <ul>
+              <li><strong>阶段编号：</strong>方莓-A</li>
+              <li><strong>阶段名称：</strong>热恋期</li>
+              <li><strong>当前关系：</strong>恋人</li>
+              <li><strong>当前状态：</strong>部分监视行为已暴露；设备曾拆除；大部分后续恢复</li>
+              <li><strong>当前访问权限：</strong>仅记录人</li>
+              <li><strong>记录人情感变量：</strong></li>
+            </ul>
+            <p>档案记录已移出旧样本库。</p>
+            <p>移出原因：记录对象反应持续更新，初始分类无法完整覆盖。记录对象在知情、半知情、默许及未完全知情状态下，反应差异明显。记录对象对记录人的影响已进入长期变量。</p>
+            <p class="profile-warning">当前处理方式：独立目录。目录名：方莓。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="memoPage">
+      <div class="page-inner">
+        <div class="topbar">
+          <button class="ghost-button" data-goto="indexPage">返回目录</button>
+          <span class="topbar-title">02 / MEMO</span>
+        </div>
+
+        <div class="content-title">
+          <span class="en-label">MEMORANDUM</span>
+          <h2>备忘录</h2>
+        </div>
+
+        <div class="paper-card content-body memo-page-body">
+          <div class="memo-book">
+
+            <div class="memo-entry">
+              <div class="memo-shell">
+                <div class="memo-side memo-front">
+                  <span class="memo-tag">MEMO 01</span>
+                  <h3>关于海豹</h3>
+                  <div class="memo-photo">
+                    <img src="memo-seal.jpg" alt="海豹配图" />
+                  </div>
+                  <div class="memo-copy">
+                    <p><span class="memo-trigger" data-flip-target>方老师</span>睡觉特别喜欢抱那只海豹。</p>
+                    <p>她会把脸埋进去，脸颊肉被挤出来，软软的，手臂紧紧圈着，睡熟以后手指还会抓着边缘，海豹被她压得有点变形。</p>
+                    <p>有一次海豹被挤到床边，她半夜醒了一点，眼睛没睁开，手先往旁边摸。</p>
+                    <p>摸不到以后，眉头皱了一下，像还没清醒，但是人已经开始不开心。</p>
+                    <p>我被她逗笑，又小心翼翼地把海豹塞回她怀里。</p>
+                    <p>她抱住以后，很快睡了过去，我揉了揉她的头发，轻轻吻了上去。</p>
+                    <p>第二天问她记不记得，她说：“不记得，张老师不要造谣。”</p>
+                    <p>但那天早上，海豹还被她压在怀里，两只萌物叠在一起。</p>
+                  </div>
+                </div>
+                <div class="memo-side memo-back">
+                  <span class="memo-tag">HIDDEN</span>
+                  <h3>隐藏项｜关于海豹</h3>
+                  <div class="memo-copy">
+                    <p><strong>观察项：</strong>海豹玩偶。</p>
+                    <p>睡眠锚点。</p>
+                    <p>入睡前、浅眠中、噩梦后均有抓握行为。</p>
+                    <p>抓握顺序通常为：海豹边缘、被子、附近衣物、我的手臂或衣服。</p>
+                    <p>玩偶在可触及范围内时，入睡速度更快。</p>
+                    <p>玩偶被挤到床边时，会出现短暂摸索，眉心收紧，手指反复寻找。</p>
+                    <p>找回后呼吸趋稳。</p>
+                    <p>噩梦状态下，海豹优先级下降。</p>
+                    <p>她会先抓海豹，抓不稳后转向人。</p>
+                    <p>说明恐惧阈值上升时，安抚需求从物转移到我。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="memo-entry">
+              <div class="memo-shell">
+                <div class="memo-side memo-front">
+                  <span class="memo-tag">MEMO 02</span>
+                  <h3>关于乔迁礼</h3>
+                  <div class="memo-photo">
+                    <img src="memo-necklace.jpg" alt="项链配图" />
+                  </div>
+                  <div class="memo-copy">
+                    <p><span class="memo-trigger" data-flip-target>方老师</span>送锁骨链的时候，先提醒我别太高兴。</p>
+                    <p>她说只有一点点是真钻石，其他都是仿的，她只买得起这个。</p>
+                    <p>说这句话的时候语速很快，好像先把价格讲清楚，就能把礼物的分量压轻一点。</p>
+                    <p>后面她又说，很好看，配锁骨非常性感。</p>
+                    <p>“性感”两个字说完，她自己脸先红了。</p>
+                    <p>我低头让她替我戴上，扣子很小，她扣了两次。</p>
+                    <p>第二次扣上以后，手指在我后颈停了一下。</p>
+                    <p>链子落到锁骨上时，她看了一眼，很快移开。</p>
+                    <p>是我之前在她熟睡时戴上的，后来方老师拍了那张照片。</p>
+                    <p>草莓坠子挂在浅绿色衣领中间，格外显眼。</p>
+                    <p>我们的项链是一对。</p>
+                  </div>
+                </div>
+                <div class="memo-side memo-back">
+                  <span class="memo-tag">HIDDEN</span>
+                  <h3>隐藏项｜关于乔迁礼</h3>
+                  <div class="memo-copy">
+                    <p><strong>观察项：</strong>项链。</p>
+                    <p>她赠送钻石锁骨链时，提前弱化价格与材质，疑似降低礼物重量，避免显得过于认真。</p>
+                    <p>锁骨链佩戴后，她视线停留点变化明显：锁骨、链扣、领口。她会快速移开，但回看次数增加。</p>
+                    <p>草莓项链佩戴状态稳定。</p>
+                    <p>浅绿色衣服与红色坠子形成明显对比。拍照时坠子位置居中，未被衣领遮挡。</p>
+                    <p>补充：草莓项链仍保持礼物定义。</p>
+                    <p>定位功能不暴露。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="memo-entry">
+              <div class="memo-shell">
+                <div class="memo-side memo-front">
+                  <span class="memo-tag">MEMO 03</span>
+                  <h3>关于夸奖</h3>
+                  <div class="memo-copy">
+                   <p><span class="memo-trigger" data-flip-target>方老师</span>不太习惯热烈的夸奖，尤其是陌生人说的。</p>
+                    <p>她会先尴尬地笑笑，像习惯反应比情绪先出来，然后会说谢谢，有时候还会加敬语，客气得像把自己往后退了一步。</p>
+                    <p>其实方老师并不是不开心。</p>
+                    <p>只是那种开心很快就会被她压下去，好像不能直接收下。</p>
+                    <p>她会怀疑对方是不是随口一说，也会怀疑自己是不是应该马上回一句同样好听的话。</p>
+                    <p>于是她开始着急，想回夸，又找不到合适的词语。</p>
+                    <p>有一次别人夸她画里的女孩子很漂亮，她回了谢谢，过了几秒，又补了一句“您也很会看”。</p>
+                    <p>这句话很方老师。</p>
+                    <p>想把赞美还回去，又不知道怎么还，最后急急忙忙递出去一句有点笨的客气话。</p>
+                    <p>可以把夸奖说得具体一些，给方老师发挥的余地。</p>
+                  </div>
+                </div>
+                <div class="memo-side memo-back">
+                  <span class="memo-tag">HIDDEN</span>
+                  <h3>隐藏项｜关于夸奖</h3>
+                  <div class="memo-copy">
+                    <p><strong>观察项：</strong>亲密表达接收。</p>
+                    <p>泛化亲密词需要回避。</p>
+                    <p>典型反应：客气化、打哈哈、转移话题、否认、沉默。</p>
+                    <p>原因推测：泛化夸奖缺乏证据，容易被她归类为哄骗、客套或暂时性情绪表达。</p>
+                    <p>她无法确认对方究竟看见了什么。</p>
+                    <p>有效夸奖必须具体。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="memo-entry">
+              <div class="memo-shell">
+                <div class="memo-side memo-front">
+                  <span class="memo-tag">MEMO 04</span>
+                  <h3>关于眼镜</h3>
+                  <div class="memo-copy">
+                    <p><span class="memo-trigger" data-flip-target>方老师</span>睡醒找眼镜的时候很有意思。</p>
+                    <p>先摸枕边，再摸被子边，如果两边都没有，就会停一下。</p>
+                    <p>像世界突然被调成了最低清晰度。</p>
+                    <p>她自己大概不知道，她看不清东西的时候会下意识皱眉，眼睛眯起来，整个人比平时更认真一点。</p>
+                    <p>画稿画久了，镜架会往下滑，她用食指往上推，有时候推完还会顺手摸一下刘海。</p>
+                    <p>低头看手机时，镜片边缘会反光，挡住半只眼睛。</p>
+                    <p>她不喜欢别人一直盯着她看，所以我一般只看一会儿。</p>
+                    <p>她以为我只看一会儿。</p>
+                  </div>
+                </div>
+                <div class="memo-side memo-back">
+                  <span class="memo-tag">HIDDEN</span>
+                  <h3>隐藏项｜关于眼镜</h3>
+                  <div class="memo-copy">
+                    <p><strong>观察项：</strong>眼镜。</p>
+                    <p>近视度数高。</p>
+                    <p>摘下眼镜后，对周围定位依赖手部摸索。</p>
+                    <p>醒后第一摸索范围通常为枕边、被子边缘、身体右侧。</p>
+                    <p>若几秒内未寻找到，出现短暂停顿，眉心收紧，眼睛眯起。</p>
+                    <p>眼镜放置位置影响醒后情绪。</p>
+                    <p>枕边：容易被压到。</p>
+                    <p>床头：摸索时间较长。</p>
+                    <p>床头柜左侧：成功率高，焦躁反应低。</p>
+                    <p>画稿时推眼镜频率上升。疲惫时推眼镜动作变慢，伴随揉眼、低头时间变长。</p>
+                    <p>镜片反光会遮挡视线，她本人不处理，除非影响画稿。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="diaryPage">
+      <div class="page-inner">
+        <div class="topbar"><button class="ghost-button" data-goto="indexPage">返回目录</button><span class="topbar-title">03 / DIARY</span></div>
+        <div class="content-title"><span class="en-label">DIARY</span><h2>日记</h2></div>
+        <div class="paper-card content-body">
+          <div class="diary-grid">
+            <button class="diary-entry-button" type="button" data-diary="1"><strong>X年X月X日</strong></button>
+            <button class="diary-entry-button" type="button" data-diary="2"><strong>X年X月X日</strong></button>
+            <button class="diary-entry-button" type="button" data-diary="3"><strong>X年X月X日</strong></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<section class="page" id="strawberryPage">
+  <div class="page-inner">
+    <div class="topbar">
+      <button class="ghost-button" data-goto="indexPage">返回目录</button>
+      <span class="topbar-title">04 / STRAWBERRY</span>
+    </div>
+
+    <div class="content-title">
+      <span class="en-label">STRAWBERRY RECORD</span>
+      <h2>草莓记录</h2>
+    </div>
+
+    <div class="paper-card content-body strawberry-record-page">
+      <div class="strawberry-list">
+
+        <button class="strawberry-row" data-record="1">
+          <span class="record-num">01</span>
+          <span class="record-title">第一颗草莓</span>
+          <span class="record-status">未查看</span>
+        </button>
+
+        <button class="strawberry-row" data-record="2">
+          <span class="record-num">02</span>
+          <span class="record-title">第二颗草莓</span>
+          <span class="record-status">未查看</span>
+        </button>
+
+        <button class="strawberry-row" data-record="3">
+          <span class="record-num">03</span>
+          <span class="record-title">第三颗草莓</span>
+          <span class="record-status">未查看</span>
+        </button>
+
+        <button class="strawberry-row" data-record="4">
+          <span class="record-num">04</span>
+          <span class="record-title">第四颗草莓</span>
+          <span class="record-status">未查看</span>
+        </button>
+
+        <button class="strawberry-row" data-record="5">
+          <span class="record-num">05</span>
+          <span class="record-title">第五颗草莓</span>
+          <span class="record-status">未查看</span>
+        </button>
+
+        <button class="strawberry-row" data-record="6">
+          <span class="record-num">06</span>
+          <span class="record-title">第六颗草莓</span>
+          <span class="record-status">未查看</span>
+        </button>
+
+        <button class="strawberry-row" data-record="7">
+          <span class="record-num">07</span>
+          <span class="record-title">第七颗草莓</span>
+          <span class="record-status">未查看</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+    <button class="secret-trigger" id="secretTriggerOne" title="hidden">莓</button>
+    <button class="secret-trigger second" id="secretTriggerTwo" title="hidden"></button>
+
+    <div class="session-window" aria-hidden="true">
+      <div class="session-title">
+        <span>SESSION RECORD</span>
+        <button class="session-dot" id="sessionCamera" type="button" title="camera"></button>
+      </div>
+      <div class="session-row"><span>停留</span><strong id="sessionTime">00:00:00</strong></div>
+      <div class="session-row"><span>页面</span><strong id="sessionPage">暗号</strong></div>
+      <div class="session-row"><span>状态</span><strong>记录中</strong></div>
+    </div>
+  </main>
+<div class="modal-mask" id="cameraModal">
+  <div class="camera-window">
+    <div class="camera-window-bar">
+      <div class="camera-bar-left">
+        <span class="camera-title">实时画面</span>
+        <span class="camera-dot"></span>
+        <span class="camera-status">录制中：</span>
+        <span class="camera-time" id="cameraLiveTime">00:00:00</span>
+      </div>
+
+      <button class="camera-close" id="cameraClose" type="button">×</button>
+    </div>
+
+    <div class="camera-screen">
+      <img id="cameraImage" src="camera-1.jpg" alt="实时画面">
+    </div>
+  </div>
+</div>
+<div class="modal-mask" id="strawberryRecordModal">
+  <div class="modal-card strawberry-detail-card">
+    <div class="window-head">
+      <span class="window-title" id="strawberryRecordTitle">STRAWBERRY / 01</span>
+      <button class="window-close" id="closeStrawberryRecord" type="button">×</button>
+    </div>
+
+    <div class="strawberry-detail-text" id="strawberryRecordText">
+      这里会显示具体记录。
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="strawberryFinalModal">
+  <div class="modal-card strawberry-final-card">
+    <span class="en-label">FINAL QUESTION</span>
+    <h3>方老师，你现在是什么感觉？</h3>
+    <button class="ghost-button" id="closeStrawberryFinal" type="button">关闭</button>
+  </div>
+</div>
+
+  <div class="modal-mask" id="diaryReadModal">
+    <div class="modal-card diary-main-card">
+      <div class="window-head"><span class="window-title" id="diaryReadTitle">DIARY</span><button class="window-close" id="closeDiaryRead" type="button">×</button></div>
+      <img id="diaryReadImage" class="diary-read-image" alt="">
+      <div class="strawberry-detail-text" id="diaryReadText"></div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="diaryLargeModal">
+    <div class="modal-card diary-main-card">
+      <div class="window-head"><span class="window-title">HIDDEN DIARY / UNLOCKED</span><button class="window-close" id="largeModalClose" type="button">×</button></div>
+      <h3>张平视角前言</h3>
+      <div class="strawberry-detail-text">最开始我只是像处理过去那些观察对象一样，为方莓建立了一份档案。
+姓名，外貌，作息，偏好，回避事项，身体特征，情绪波动，无法自洽时会出现的微小反应。
+我享受它们被写下来，被归类，被排列在我能随时调取的位置的过程。
+按之前的流程来说，她也会和前几个人一样，最终被我完整地理解、诱导，然后结束。
+但方莓却没那么听话。
+第一次见到她的时候，我就意识到有哪里出了错。
+我当然知道该露出什么样的表情。
+亲切，开朗，无害，带一点恰到好处的冒犯感。
+这通常很好用，会让人放松警惕，也会让她们误以为主动权还在自己手里。
+可那天我靠近她时，身体比思维更早做出了反应。
+我嗅见她的呼吸，她的气息，看见她遮住眼睛的刘海，看见她迟钝又慌乱地站在门后，像一只还没意识到自己已经被盯上的动物。
+很奇怪，我没有立刻产生胜利感。
+那一瞬间，我只想再靠近一点，再近一点。
+近到她的每一寸气息都属于我，近到她身上所有不愿意给别人看的地方，都能被我妥善地存放。
+这个念头并不体面。
+我很清楚，但我很快接受了它。
+人为什么一定要保持边界？
+为什么不能被另一个人完整地记住、拆开、理解，再重新放回她自己也看不清的位置？
+如果方老师总是无法照顾好自己，那由我来替她记录，替她判断，替她把那些混乱的部分摆正，似乎也没有什么不合理。
+观察日记就是在那之后出现的。
+起初只是几行字。
+她今天看了我多久，她是否回避视线，她说话时有没有停顿，笑的时候嘴角先动还是眼睛先亮。
+后来变成页面。
+再后来，变成了这个网站。
+我经常会在深夜打开它。
+灰绿色的背景，粉色的标记，排列整齐的分类。
+好像草莓。
+好想操莓。
+我亲手建立了一间独属于我的，满是方莓的房间。
+这里没有噪音，没有旁人，没有会打断我的东西。
+只有她。
+她的档案，她的习惯，她对我无意识的纵容，她每一次以为自己藏得很好的反应。
+我越来越喜欢待在这里，也越来越痴迷记录她的每一点，只有我能看到的特点。
+可居然还是不够。
+我以为把她写下来就会缓解这种欲望，事实证明没有。
+文字只能让我更清楚地意识到，我想要的从来不是一份完整档案。
+我突然恶劣地想要她发现这里。
+我想让她看见，我在每一个她睡着的夜里都写了些什么，想让她知道，自己每一次迟钝的回望，每一次装作无事发生的沉默，每一次放任我靠近的退让，都被我准确地记了下来。
+我甚至有些好奇。
+亲爱的方老师，你会害怕吗？</div>
+    </div>
+  </div>
+
+  <div class="lock-message" id="lockMessage"><strong>只看向我。</strong><span>记录未完成。请保持页面停留。</span></div>
+
+  <div class="chaos-window small" id="chaosOne" style="left: 30%; top: 27%;">你会觉得恶心，觉得荒唐，觉得我终于露出了不该被你看见的那一面？</div>
+  <div class="chaos-window small" id="chaosTwo" style="right: 28%; top: 33%;">还是会像往常一样，慢半拍地停在那里，迟迟想不出该怎么责备我？</div>
+  <div class="chaos-window small" id="chaosThree" style="left: 32%; bottom: 34%;">你会退出这个页面吗？</div>
+  <div class="chaos-window small" id="chaosFour" style="right: 30%; bottom: 30%;">还是会继续往下看。继续看我怎么记录你，怎么拆解你，继续看向我。</div>
+  <div class="chaos-window small" id="chaosFive" style="left: 50%; top: 44%; transform: translateX(-50%);">你在看着我吗？方老师。</div>
+  <div class="chaos-window small" id="chaosSix" style="left: 50%; top: 56%; transform: translateX(-50%);">一直看向我，方老师。</div>
+
+  <div class="chaos-window glitch-final" id="chaosFinal" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
+    <div class="window-head"><span class="window-title">FINAL NOTICE</span><button class="window-close" id="finalClose" type="button">×</button></div>
+    <p>只看向我。<br /><span style="font-size:12px;opacity:.72;letter-spacing:.12em;">ERROR: EXIT_DENIED / RECORD_LOCKED / LOOK_AT_ME / LOOK_AT_ME / LOOK_AT_ME</span></p>
+  </div>
+
+  <div class="modal-mask" id="secretModalOne">
+    <div class="phone-record-card">
+      <div class="phone-topbar">
+        <span>ZHANG PING / PHONE</span>
+        <span>2026.5.20</span>
+      </div>
+      <div class="phone-screen">
+        <img src="search-record.jpg" alt="张平手机搜索记录" />
+      </div>
+      <p class="phone-caption">
+        <strong>SEARCH HISTORY</strong><br />来源：记录人手机。状态：未归档。该截图被暂存于草莓园隐藏入口。
+      </p>
+      <button class="ghost-button" data-close="secretModalOne">关闭</button>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="secretModalTwo">
+    <div class="modal-card"><span class="en-label">HIDDEN PAGE 02</span><h3>隐藏页二</h3><p>这里先留空。这个入口现在藏在右下角的小浅色圆点里，后面可以换成档案编号、划痕、日期、签名或其他不明显的图标。</p><button class="ghost-button" data-close="secretModalTwo">关闭</button></div>
+  </div>
+
+  <script>
+    const PASSWORD = "00022414";
+    const bgm = document.querySelector("#bgm");
+    let bgmStarted = false;
+
+ const musicButton = document.querySelector("#musicButton");
+
+function startBgm() {
+  if (!bgm || bgmStarted) return;
+
+  bgm.volume = 0.35;
+
+  bgm.play().then(() => {
+    bgmStarted = true;
+    if (musicButton) {
+      musicButton.textContent = "♪ 音乐播放中";
+      musicButton.classList.add("playing");
+    }
+  }).catch(() => {
+    if (musicButton) {
+      musicButton.textContent = "♪ 点我开启音乐";
+    }
+  });
+}
+
+if (musicButton) {
+  musicButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    startBgm();
+  });
+}
+
+    const pages = document.querySelectorAll(".page");
+    const passwordInput = document.querySelector("#passwordInput");
+    const passwordButton = document.querySelector("#passwordButton");
+    const errorText = document.querySelector("#errorText");
+    const sessionStart = Date.now();
+    const sessionTime = document.querySelector("#sessionTime");
+
+    function formatSessionTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+      const seconds = String(totalSeconds % 60).padStart(2, "0");
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
+   setInterval(() => {
+  const nowText = formatSessionTime(Date.now() - sessionStart);
+
+  if (sessionTime) sessionTime.textContent = nowText;
+
+  const cameraLiveTimeNow = document.querySelector("#cameraLiveTime");
+  if (cameraLiveTimeNow) cameraLiveTimeNow.textContent = nowText;
+}, 1000);
+
+    const pageNames = {
+      passwordPage: "暗号",
+      enterPage: "进入页",
+      indexPage: "目录",
+      profilePage: "档案",
+      memoPage: "备忘录",
+      diaryPage: "日记",
+      strawberryPage: "草莓记录"
+    };
+
+    function showPage(id) {
+      pages.forEach((page) => page.classList.remove("active"));
+      const target = document.querySelector("#" + id);
+      if (target) target.classList.add("active");
+      const sessionPage = document.querySelector("#sessionPage");
+      if (sessionPage && pageNames[id]) sessionPage.textContent = pageNames[id];
+      window.scrollTo(0, 0);
+    }
+
+    function checkPassword() {
+      if (passwordInput.value.trim() === PASSWORD) {
+        errorText.textContent = "";
+        startBgm();
+        showPage("enterPage");
+      } else {
+        errorText.textContent = "暗号不对。";
+      }
+    }
+
+    passwordButton.addEventListener("click", checkPassword);
+    passwordInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") checkPassword();
+    });
+
+    document.querySelectorAll("[data-goto]").forEach((button) => {
+      button.addEventListener("click", () => showPage(button.dataset.goto));
+    });
+
+    document.querySelectorAll("[data-flip-target]").forEach((trigger) => {
+      trigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const targetCard = trigger.closest(".memo-entry");
+        if (targetCard) {
+          targetCard.classList.toggle("flipped");
+        }
+      });
+    });
+
+    const strawberryRecords = {
+  1: {
+    title: "STRAWBERRY / 01",
+    text: `状态：方老师被我诱导，以绘画参考为由主动邀请我进门，房间灯光只开一盏台灯。她黑色中长发散着，戴着黑框眼镜。
+
+前戏： 她突然靠近主动吻我，舌尖直接探入，双手按在我胸口。我抱住她腰，她小腹贴上来时已有轻微颤动。我掀起她衣服，手掌覆盖她乳房揉捏，她呼吸变乱但没退开。我手指下滑到她内裤外侧按压，她阴唇很快湿润。
+
+入体：我进入她阴道时动作较快，她腿肉收紧环住我，但仅持续几分钟。她体力明显不支，腰部动作变弱，眼神开始涣散。我尝试颈侧轻压，她阴道收缩了两三次后就不再主动回应。
+
+事后：我抽出时她已失去稳定配合，我抱她去洗澡清理，方老师已经完全昏迷。
+
+高潮次数：0次（体力迅速下降，未达高潮）
+
+身体反应：阴道收缩频率：入体初期每4-6次抽插有轻微收缩，后期几乎消失；
+腿部肌肉前紧后松；
+呼吸急促但很快变浅；
+全程无哭泣，眼镜滑到一旁，手指抓床单后慢慢松开。`
+  },
+  2: {
+    title: "STRAWBERRY / 02",
+    text: `状态：咖啡厅交谈后。她化了妆穿裙子，状态焦虑，后被我打断，她手机经过我处理弹出视频缩略图及音频，我们一起去了洗手间。
+前戏：我把她抵在洗手台边，吻了上去，她提出口交，风险环境让方老师呼吸急促，手指有些抖，但动作很直接。
+
+口交过程：她含住我阴茎，舌头先在龟头处舔绕，随后慢慢含深。洗手间空间狭小，她跪姿让裙摆堆在膝盖上，黑框眼镜反射着灯光。她一只手扶着我大腿，另一只手握住根部配合吞吐。我一手按在她后脑，另一手轻掐她颈侧。她呼吸受控时含得更深，喉咙出现明显收缩，眼睛抬起来看我，眼神清醒带着水光。我手指进入她会阴处，湿了，我开口，她没否认，只是吞吐节奏加快，舌面用力压着我阴茎下侧。
+
+事后：我帮她拉好裙摆、整理头发。她站起身照镜子，脸颊通红，整理好后先出门，没再看我。
+
+高潮次数： 0次（她未达高潮）
+
+身体反应： 喉咙收缩频率：含深时每3-5次吞吐明显收缩；颈侧被掐时呼吸停顿，鼻息变重，跪姿下腿肉紧绷，小腹因紧张轻颤，手指用力抓我大腿，指节发白，眼角湿润但全程未哭，眼神多次抬起来对视。
+`
+  },
+  3: {
+    title: "STRAWBERRY / 03",
+    text: `状态：正式约会后在我家。她喜欢绿色床品和香氛已提前备好，亲密时间较长。
+
+前戏：我从吻她锁骨开始，慢慢下移。她主动脱掉上衣，我嘴唇含住她乳头，她小肚子起伏明显。我手指进入阴道抽插，阴部产生分泌物。
+
+入体：我进入时她腰向上抬，我稳定深插，双手掐住她的脖颈，她呼吸急促，阴道壁猛地收缩，腿缠得更紧，我变换节奏，她小腹随撞击颤动加剧，每次颈侧收紧她都呼吸停顿后猛地补气。
+
+事后： 我抱她进浴室冲洗，她靠着我让我清洗腿间和身体。擦干后她躺在绿色床单上，体力透支，闭眼休息。
+
+高潮次数：3次（前戏1次，入体2次）
+
+身体反应：阴道收缩频率：前戏每6-9秒一次，入体每7-11次抽插明显痉挛，高潮前每3-5次，颈侧掐压时呼吸停2-3秒，腿肉和小腹颤动同步，手指紧紧抓着我手臂校准。`
+  },
+  4: {
+    title: "STRAWBERRY / 04",
+    text: `状态：搬到对门后当晚。她送我钻石锁骨链，我在她睡着时给她戴上草莓项链，随后压住她。
+
+前戏： 她摸到新链子睁眼，我立即吻颈侧并掐住脖子侧面。她腿自然分开，我手指探入阴道，她已湿润且快速收缩。她校准手指弯曲角度。
+
+入体：我进入她阴道，我一手保持较重颈侧掐压，她阴道剧烈收缩，主动把脖子往我掌心送。小腹撞击声清晰，她腰反复弓起，腿肉因用力而发颤。
+
+事后： 我擦拭她腿间液体和颈侧红痕，调整两根项链。她手指勾我锁骨链睡着。
+
+高潮次数：3次
+
+身体反应：*阴道收缩频率：入体后每5-8次抽插一次痉挛，高潮前每2-3次强烈收缩；颈侧重压时脸颊泛红、呼吸停顿明显，小腹颤动剧烈，指甲在我后背留痕。`
+  },
+  5: {
+    title: "STRAWBERRY / 05",
+    text: `状态：她主动来我打工画室勾引，之后在隔壁空教室。风险高，她主动性强。
+
+前戏：她把我推坐在椅子上，自己跨坐上来吻我，磨蹭我下体，主动拉我手按在她胸口，我掀开她衣服吸吮乳头，手指隔着内裤按压，内裤很快湿透。
+
+入体：我从后进入，双手揉捏臀部，虎牙在她右臀胎记处留下咬痕，她阴道明显收缩，我频率加快，力道加重，手指在她口中抽插。
+
+事后：我抱稳她，她腿软得站不住。我帮她穿好衣服，她整理头发时手还有点抖，快速检查门外后离开。
+
+高潮次数： 1次
+
+身体反应：阴道收缩频率：入体后每4-7次起落一次强烈收缩，高潮前几乎连续痉挛，腿肉因后入站不稳而酸颤，眼镜由于过于晃动而掉落。`
+  },
+  6: {
+    title: "STRAWBERRY / 06",
+    text: `状态：绳缚专场。她看到我准备的多捆麻绳，震惊后开始参与挑选。
+
+前戏：她挑了较软的一捆，主动伸双手让我绑，我把她双手反绑身后，绳子绕过胸部勒出浅痕，再固定大腿根部，她被绑成跪姿，我系了蝴蝶结，并询问“方老师是不是我的专属礼物？嗯？”阴部完全暴露，已明显湿润。
+
+入体：我从后面进入她阴道，拉扯绳子调整她腰的角度。她无法大幅移动，只能小幅度后顶。每次拉绳她阴道都剧烈收缩，绳结因挣扎勒得更深。
+
+事后： 我逐段解开绳子，检查手腕、大腿和胸口的红痕，仔细按摩。她靠在我胸口，呼吸久久不平，手指抓着我衣服。
+高潮次数：3次
+身体反应：阴道收缩频率：绳缚拉紧时每3-5秒明显痉挛，入体后每4-6次抽插强烈收缩；手腕和大腿红痕明显。`
+  },
+  7: {
+    title: "STRAWBERRY / 07",
+    text: `状态：吵架和好后，温泉酒店房间。
+
+前戏：我咬住她的脸颊，从眼睛往下亲吻，她小腹仍紧绷，我手指进入阴道，她湿得比平时更快，但动作带着情绪，腰部扭动像在发泄。
+
+入体：我进入时，她阴道收缩得又急又乱。深插后她眼角有眼泪滑落，高潮时全身发抖。
+
+事后：我抽出后她抓住我衣服不放，脸埋在我肩窝。我擦拭她腿间和泪痕，她呼吸平稳后仍没松手。
+
+高潮次数：4次
+
+身体反应：阴道收缩频率：入体初期混乱每3-8次不等，高潮前转为每2-4次强烈痉挛；颈侧掐压时呼吸混着轻泣，眼角流泪但无大声哭泣。`
+  }
+};
+
+const viewedStrawberryRecords = new Set();
+const strawberryRecordModal = document.querySelector("#strawberryRecordModal");
+const strawberryRecordTitle = document.querySelector("#strawberryRecordTitle");
+const strawberryRecordText = document.querySelector("#strawberryRecordText");
+const strawberryFinalModal = document.querySelector("#strawberryFinalModal");
+
+document.querySelectorAll(".strawberry-row").forEach((row) => {
+  row.addEventListener("click", () => {
+    const recordId = row.dataset.record;
+    const record = strawberryRecords[recordId];
+
+    if (!record) return;
+
+    strawberryRecordTitle.textContent = record.title;
+    strawberryRecordText.textContent = record.text;
+    strawberryRecordModal.classList.add("active");
+
+    viewedStrawberryRecords.add(recordId);
+    row.classList.add("viewed");
+    row.querySelector(".record-status").textContent = "已查看";
+
+    if (viewedStrawberryRecords.size === 7) {
+      setTimeout(() => {
+        strawberryFinalModal.classList.add("active");
+      }, 500);
+    }
+  });
+});
+
+document.querySelector("#closeStrawberryRecord").addEventListener("click", () => {
+  strawberryRecordModal.classList.remove("active");
+});
+
+document.querySelector("#closeStrawberryFinal").addEventListener("click", () => {
+  strawberryFinalModal.classList.remove("active");
+});
+
+    
+    const diaryRecords = {
+      1: {
+  title: "X年X月X日",
+  image: "diary-hairtie.jpg",
+  text: `她把发圈落在了我这里。
+黑色的，很普通。
+外面包着布，用久了有一点松，内侧缠着一根很细的黑发。
+它落在洗手台右侧，旁边有一小圈水渍。
+那天她洗完手出来，刘海湿了一点，眼镜上起雾，站在门口问我吹风机放哪。
+她走以后，我收拾洗手台，看见那根发圈。
+按理说它应该被扔掉，或者放进抽屉，等下次还给她。
+洗手台上不适合放这种东西，容易沾水，也容易粘上头发。
+它不应该留在原处。
+我都没有，那根发圈还静静地躺在原处。
+我突然想起，以前我并不喜欢别人动我的东西。
+杯子，书，文件，调料罐，衣架，拖鞋，所有物品都应该在它们该在的位置。
+位置清楚，功能就清楚，功能清楚，房间就不会变成一团噪音。
+我的父亲很喜欢用声音占领一个地方。
+脚步声，电视声，烟味，摔门声，还有那种强硬到让人厌烦的呼吸。他不整理任何东西，却要求所有人按照他的情绪移动。
+我离开以后，很长时间都讨厌混乱。
+混乱代表别人留下的痕迹。
+代表失控。
+代表无法预测下一秒会从哪里传来声音，谁会打开哪扇门，谁会用一种理所当然的语气把我的东西挪走。
+可方莓的痕迹不一样。
+她用过的杯子放在桌角，我没有立刻收。她把漫画放在沙发扶手上，书脊朝外，我也没有马上摆正。
+她忘在洗手台边的发圈，按理说应该被我归类、收纳，或者丢掉。
+我也没有。
+我拿起它看了一会儿。
+那根头发太细，绕在布面上，不仔细看几乎看不见。我把它取下来，用纸巾包好。发圈套到左手腕上时，有一点紧。
+它没有明确功能。
+不是表，不是手环，也不是任何应该出现在我身上的东西。
+可它贴在手腕上，留下一圈很浅的压痕。
+像一件她忘记带走的东西，暂时扣住了我。
+后来方老师也看见了。
+但是我没有还。
+她有时候会把东西落在我这里。
+我以前会觉得这叫混乱。
+现在觉得，也可以叫留下。`
+      },
+      2: {
+        title: "X年X月X日",
+        text: `我凌晨五点醒了一次。
+窗外还没亮，厨房里只有抽油烟机下面那盏小灯。
+牛肉粥熬到第七十分钟的时候，锅边起了一圈很浅的白沫，我把火调小，又站了一会儿。
+方莓最近吃得不太像样。
+便利店便当，牛奶，方便面，偶尔买饭团。
+她自己应该也知道不好，但知道和改掉之间还是相差甚远。
+我出门时天还没完全亮。
+跑到她家附近的时候，路边早餐店刚开门，蒸笼的热气往外冒。
+她那栋楼下面的便利店还亮着灯，货架靠窗，牛奶摆在第二层。
+我绕公园跑了两圈，那窝小猫还在。
+母猫趴在灌木边，小猫有三只。
+最小那只反应慢一点，走路不太稳，尾巴竖起来的时候像一小截细线。
+我之前确认过它们的位置，也确认过方莓会喜欢。
+这里离她家不远，路线自然，不像特意带她去某个地方。
+一切都在合适的位置上。
+中午我去便利店取饭盒的时候，她下楼了。
+刘海有点乱，黑框眼镜滑到鼻梁中间，穿的是很普通的上衣和长裤，袖口被她自己捏得有点皱。
+她看见我拎着饭盒，先愣了一下，随后问：“你怎么在这？”
+我说晨跑路过，顺便来取东西。
+她看了眼我手里的饭盒，又看了眼我。
+我笑了一下，没有解释太多。
+吃完以后，我们一起去了公园走走。
+到灌木那边时，母猫先抬头。
+方莓停住了脚步，她停得很明显，像整个人忽然从和我说话的状态里抽出来，注意力全部落到那几只小东西身上。她没有立刻靠近，只站在原地看了一会儿。
+最小那只从母猫身边爬出来，走两步，又坐下，眼睛半睁着，像还没适应这么亮的世界。
+
+方莓蹲下去。
+长裤膝盖蹭到地面，她没有管。
+她平时有时候很在意自己看起来奇不奇怪，可那一刻没有。
+她只是蹲在那里，手放在膝盖上，声音放得很轻。
+“它好小。”
+这句话没什么特别。
+可她说出来的时候，眼睛很亮。
+那只小猫又往前走了几步，踩到一小块湿泥，爪子陷进去，拔出来的时候晃了一下。
+好可爱。
+我突然想到：“叫小莓怎么样？”
+方莓立刻抬头看我。“不要。”
+她拒绝得很坚决。
+“为什么？”
+她皱了一下眉，像觉得这个问题很莫名其妙：“和我一样的名字会变得很倒霉。”
+她说得太自然了，自然到这似乎不像是一句玩笑，她把自己的名字放在那只小猫身上，第一反应不是纪念，是担心小猫会倒霉。
+我看着她。
+她大概没觉得自己说了什么奇怪的话，还在低头看那只小猫。
+它正努力越过一片落叶，走得很慢，像一艘太小的船，硬要从风浪里开出去。
+我说：“那叫幸运号吧。”
+她愣了一下：“什么？”
+“幸运号。”我说，“像船。”
+她看向那只猫，又看我。
+我继续说：“还因为我自从遇见某人之后，就变得很幸运了。”
+“是吗？”她突然站起身，“我们去买点猫粮吧。”
+我们去买了一小袋猫粮。
+她看配料表看得很认真，比给自己买吃的认真许多。
+回到公园的时候，幸运号还在。
+方莓把猫粮倒在纸巾上，母猫先凑近闻了闻，小猫后面才凑过去。
+幸运号吃得很慢，鼻尖沾了一点碎屑。
+方莓看着它，忽然说：“它会不会记得我？”
+我说：“会。”
+她没有立刻接话。
+过了一会儿，她说：“猫哪有这么聪明。”
+我说：“幸运号随小莓会比较聪明。”
+回去的路上，她拎着剩下的猫粮，袋子轻轻地晃啊晃，“下次，我们再来看它吧。”
+下次。
+晚上回家以后，我查了附近几家宠物店的配送时间，猫粮，益生菌，不容易被雨泡坏的小纸箱。
+下单前，我停了一会儿。
+这不在原来的计划里。
+原来的计划到她心软、放松、愿意和我继续待一会儿为止，就够了。
+可幸运号已经有名字了。
+有名字的东西，很难再被当成普通节点处理。
+我写下这行字时，突然又想起被写在档案上的方老师的名字。`
+      },
+      3: {
+        title: "X年X月X日",
+        text: `她睡着以后，我把草莓项链拿出来。
+房间里只开了一盏很暗的灯。她抱着那只海豹，脸压着玩偶边缘，头发散到颈侧。
+眼镜放在床头，镜腿朝外。
+她睡熟以后，呼吸很慢，我的锁骨链还在身上。
+她刚才替我扣上的。
+现在该轮到她。
+草莓坠子很小，红色在夜灯下不刺眼。
+链条长度提前调过，扣子也试过。
+里面藏着的东西不会影响重量，也不会让它看起来奇怪。
+它只是一条草莓项链。
+至少在她眼里应该是这样。
+我原本可以醒着给她。
+但是她醒着的时候，会问很多问题。
+为什么是草莓，为什么是现在，贵不贵，会不会夹头发，她会把礼物拆开，把每一个部分都问清楚，再决定自己能不能收下。
+今晚她已经给我扣了一条链子，我也想给她扣上。
+不用解释。
+我拨开她颈侧的头发，动作很慢。她动了一下，把海豹抱得更紧，没有醒。
+她的皮肤比坠子暖一点，碎发扫过我的手背，有一点痒。
+扣子合上的声音很轻。
+草莓落在她锁骨下面一点，贴着睡衣领口。
+那点红停在她身上，我看了很久。我的锁骨链还没有变热，她的草莓已经贴住她了。
+
+我们身上都有了对方留下的东西。
+早上她醒来的时候摸到脖子上的链子，她低头看了很久。
+刚睡醒的时候，她的眼神还没完全聚起来，刘海垂下来，挡住半只眼睛。手指捏着草莓坠子，晃了一下。
+“这是什么？”
+声音有点哑。
+我说：“回礼。”`
+      }
+    };
+
+    const diaryReadModal = document.querySelector("#diaryReadModal");
+    const diaryReadTitle = document.querySelector("#diaryReadTitle");
+    const diaryReadText = document.querySelector("#diaryReadText");
+    const diaryReadImage = document.querySelector("#diaryReadImage");
+
+    let diaryChaosTimer = null;
+    let diaryChaosStarted = false;
+    let diaryChaosScrollHandler = null;
+
+    function resetDiaryChaosWait() {
+      if (diaryChaosTimer) {
+        clearTimeout(diaryChaosTimer);
+        diaryChaosTimer = null;
+      }
+
+      diaryChaosStarted = false;
+
+      const diaryReadCard = diaryReadModal?.querySelector(".diary-main-card");
+      if (diaryReadCard && diaryChaosScrollHandler) {
+        diaryReadCard.removeEventListener("scroll", diaryChaosScrollHandler);
+      }
+
+      diaryChaosScrollHandler = null;
+    }
+
+    function initDiaryChaosAfterScroll() {
+      resetDiaryChaosWait();
+
+      const diaryReadCard = diaryReadModal.querySelector(".diary-main-card");
+      if (!diaryReadCard) return;
+
+      diaryReadCard.scrollTop = 0;
+
+      const checkBottom = () => {
+        const nearBottom =
+          diaryReadCard.scrollTop + diaryReadCard.clientHeight >= diaryReadCard.scrollHeight - 12;
+
+        if (nearBottom && !diaryChaosTimer && !diaryChaosStarted) {
+          diaryChaosTimer = setTimeout(() => {
+            diaryChaosStarted = true;
+            startDiaryChaos();
+          }, 3500);
+        }
+
+        if (!nearBottom && diaryChaosTimer && !diaryChaosStarted) {
+          clearTimeout(diaryChaosTimer);
+          diaryChaosTimer = null;
+        }
+      };
+
+      diaryChaosScrollHandler = checkBottom;
+      diaryReadCard.addEventListener("scroll", checkBottom, { passive: true });
+
+      setTimeout(checkBottom, 120);
+    }
+
+    document.querySelectorAll("[data-diary]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const diary = diaryRecords[button.dataset.diary];
+        if (!diary) return;
+
+        resetDiaryChaosWait();
+
+        diaryReadTitle.textContent = diary.title;
+        diaryReadText.textContent = diary.text;
+
+        if (diary.image) {
+          diaryReadImage.src = diary.image;
+          diaryReadImage.style.display = "block";
+        } else {
+          diaryReadImage.removeAttribute("src");
+          diaryReadImage.style.display = "none";
+        }
+
+        diaryReadModal.classList.add("active");
+
+        if (button.dataset.diary === "3") {
+          setTimeout(initDiaryChaosAfterScroll, 120);
+        }
+      });
+    });
+
+    document.querySelector("#closeDiaryRead").addEventListener("click", () => {
+      diaryReadModal.classList.remove("active");
+      resetDiaryChaosWait();
+    });
+
+    const diaryLargeModal = document.querySelector("#diaryLargeModal");
+    const chaosWindows = ["#chaosOne", "#chaosTwo", "#chaosThree", "#chaosFour", "#chaosFive", "#chaosSix", "#chaosFinal"].map((id) => document.querySelector(id));
+    const lockMessage = document.querySelector("#lockMessage");
+
+    function startDiaryChaos() {
+      diaryLargeModal.classList.add("active");
+      chaosWindows.forEach((windowEl) => windowEl.classList.remove("active"));
+      lockMessage.classList.remove("active");
+      document.body.classList.remove("locked");
+
+      chaosWindows.forEach((windowEl, index) => {
+        setTimeout(() => {
+          windowEl.classList.add("active");
+        }, 900 + index * 650);
+      });
+    }
+
+    document.querySelector("#largeModalClose").addEventListener("click", () => diaryLargeModal.classList.remove("active"));
+    document.querySelector("#finalClose").addEventListener("click", () => {
+      document.body.classList.add("locked");
+      lockMessage.classList.add("active");
+      document.querySelector("#chaosFinal").classList.add("active");
+    });
+
+    const sessionCamera = document.querySelector("#sessionCamera");
+    const cameraModal = document.querySelector("#cameraModal");
+    const cameraImage = document.querySelector("#cameraImage");
+    const cameraClose = document.querySelector("#cameraClose");
+    const cameraLiveTime = document.querySelector("#cameraLiveTime");
+
+    const cameraImages = [
+      "camera-1.jpg",
+      "camera-2.jpg",
+      "camera-3.jpg"
+    ];
+
+    let cameraIndex = 0;
+
+    function showCameraImage(index) {
+      if (!cameraImage) return;
+
+      cameraImage.style.animation = "none";
+      cameraImage.offsetHeight;
+      cameraImage.src = cameraImages[index];
+      cameraImage.style.animation = "";
+    }
+
+    if (sessionCamera && cameraModal) {
+      sessionCamera.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        cameraIndex = 0;
+        showCameraImage(cameraIndex);
+
+        if (cameraLiveTime && sessionTime) {
+          cameraLiveTime.textContent = sessionTime.textContent;
+        }
+
+        cameraModal.classList.add("active");
+      };
+    }
+
+    if (cameraImage) {
+      cameraImage.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        cameraIndex = (cameraIndex + 1) % cameraImages.length;
+        showCameraImage(cameraIndex);
+      };
+    }
+
+    if (cameraClose && cameraModal) {
+      cameraClose.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        cameraModal.classList.remove("active");
+      };
+    }
+
+document.querySelector("#secretTriggerOne").addEventListener("click", () => {
+      document.querySelector("#secretModalOne").classList.add("active");
+    });
+
+    document.querySelector("#secretTriggerTwo").addEventListener("click", () => {
+      document.querySelector("#secretModalTwo").classList.add("active");
+    });
+
+    document.querySelectorAll("[data-close]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelector("#" + button.dataset.close).classList.remove("active");
+      });
+    });
+
+    document.querySelectorAll(".modal-mask").forEach((mask) => {
+      mask.addEventListener("click", (event) => {
+        if (event.target === mask) mask.classList.remove("active");
+      });
+    });
+</script>
+</body>
+</html>
