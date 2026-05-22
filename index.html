@@ -1256,6 +1256,7 @@
 #cameraModal {
   background: rgba(30, 45, 40, 0.72);
   backdrop-filter: blur(8px);
+  padding: 14px;
 }
 
 .camera-window {
@@ -1291,11 +1292,7 @@
   font-weight: 600;
 }
 
-.camera-title {
-  color: rgba(31, 107, 77, 0.96);
-  text-shadow: 1px 1px rgba(175, 142, 143, 0.65);
-}
-
+.camera-title,
 .camera-status,
 .camera-time {
   color: rgba(31, 107, 77, 0.96);
@@ -1992,11 +1989,12 @@
         <span class="camera-status">录制中：</span>
         <span class="camera-time" id="cameraLiveTime">00:00:00</span>
       </div>
-      <button class="camera-close" data-close="cameraModal" type="button">×</button>
+
+      <button class="camera-close" id="cameraClose" type="button">×</button>
     </div>
 
     <div class="camera-screen">
-      <img id="cameraImage" src="camera-1.jpg" alt="实时画面">
+      <img id="cameraImage" src="images/camera-1 .jpg" alt="实时画面">
     </div>
 
     <div class="camera-hint">点击画面切换下一张记录</div>
@@ -2615,6 +2613,7 @@ document.querySelector("#closeStrawberryFinal").addEventListener("click", () => 
 const sessionCamera = document.querySelector("#sessionCamera");
 const cameraModal = document.querySelector("#cameraModal");
 const cameraImage = document.querySelector("#cameraImage");
+const cameraClose = document.querySelector("#cameraClose");
 const cameraLiveTime = document.querySelector("#cameraLiveTime");
 
 const cameraImages = [
@@ -2641,6 +2640,7 @@ if (sessionCamera && cameraModal) {
 
     cameraIndex = 0;
     showCameraImage(cameraIndex);
+
     if (cameraLiveTime && sessionTime) {
       cameraLiveTime.textContent = sessionTime.textContent;
     }
@@ -2659,11 +2659,11 @@ if (cameraImage) {
   });
 }
 
-if (sessionCamera && cameraModal) {
-  sessionCamera.addEventListener("click", (event) => {
+if (cameraClose && cameraModal) {
+  cameraClose.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    cameraModal.classList.add("active");
+    cameraModal.classList.remove("active");
   });
 }
     document.querySelector("#secretTriggerOne").addEventListener("click", () => {
