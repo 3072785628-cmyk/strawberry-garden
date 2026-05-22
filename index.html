@@ -1253,68 +1253,166 @@
 }
 
 @media (max-width: 700px) {
-  .camera-card {
+#cameraModal {
+  background: rgba(30, 45, 40, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.camera-window {
+  width: min(96vw, 1120px);
+  height: min(88vh, 760px);
+  background: rgba(246, 239, 235, 0.96);
+  border: 10px solid rgba(246, 239, 235, 0.96);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.camera-window-bar {
+  height: 42px;
+  flex: 0 0 42px;
+  background: #83c9bd;
+  border: 2px solid rgba(38, 51, 47, 0.76);
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px 0 16px;
+  color: rgba(38, 51, 47, 0.86);
+}
+
+.camera-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.camera-title {
+  color: rgba(31, 107, 77, 0.96);
+  text-shadow: 1px 1px rgba(175, 142, 143, 0.65);
+}
+
+.camera-status,
+.camera-time {
+  color: rgba(31, 107, 77, 0.96);
+  text-shadow: 1px 1px rgba(175, 142, 143, 0.65);
+}
+
+.camera-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff4a18;
+  box-shadow: 0 0 12px rgba(255, 74, 24, 0.88);
+  animation: cameraDotBlink 1s ease-in-out infinite;
+}
+
+@keyframes cameraDotBlink {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.86);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.camera-close {
+  width: 34px;
+  height: 34px;
+  border: 2px solid rgba(38, 51, 47, 0.76);
+  background: #f0a093;
+  color: rgba(38, 51, 47, 0.9);
+  font-size: 24px;
+  line-height: 1;
+  cursor: var(--cursor-pointer);
+}
+
+.camera-screen {
+  flex: 1;
+  min-height: 0;
+  border: 2px solid rgba(38, 51, 47, 0.76);
+  background: rgba(255, 255, 255, 0.66);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  cursor: var(--cursor-pointer);
+  animation: cameraImagePop 260ms ease;
+}
+
+@keyframes cameraImagePop {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(1px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+.camera-hint {
+  position: absolute;
+  left: 18px;
+  bottom: 14px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(246, 239, 235, 0.76);
+  color: rgba(38, 51, 47, 0.56);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .camera-window {
     width: 96vw;
-    height: 84vh;
+    height: 78vh;
+    border-width: 7px;
   }
 
-  .camera-photo-list img {
-    width: min(84vw, 350px);
-    max-height: 58vh;
+  .camera-window-bar {
+    height: 38px;
+    flex-basis: 38px;
+    padding-left: 10px;
   }
 
-  @keyframes cameraPhotoOne {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
-      filter: blur(2px);
-    }
-    70% {
-      opacity: 1;
-      transform: translate(-60%, -58%) scale(1.04) rotate(-7deg);
-      filter: blur(0);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(-60%, -58%) scale(1) rotate(-6deg);
-      filter: blur(0);
-    }
+  .camera-bar-left {
+    gap: 5px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
   }
 
-  @keyframes cameraPhotoTwo {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
-      filter: blur(2px);
-    }
-    70% {
-      opacity: 1;
-      transform: translate(-40%, -44%) scale(1.04) rotate(5deg);
-      filter: blur(0);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(-40%, -44%) scale(1) rotate(5deg);
-      filter: blur(0);
-    }
+  .camera-dot {
+    width: 12px;
+    height: 12px;
   }
 
-  @keyframes cameraPhotoThree {
-    0% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.72) rotate(0deg);
-      filter: blur(2px);
-    }
-    70% {
-      opacity: 1;
-      transform: translate(-50%, -48%) scale(1.08) rotate(-1deg);
-      filter: blur(0);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(-50%, -48%) scale(1.03) rotate(-1deg);
-      filter: blur(0);
-    }
+  .camera-close {
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+  }
+
+  .camera-hint {
+    font-size: 10px;
+    bottom: 10px;
+    left: 12px;
   }
 }
 .diary-read-image {
@@ -1418,12 +1516,33 @@
 .strawberry-final-card p {
   color: var(--muted);
 }
+  .music-button {
+  position: fixed;
+  right: 18px;
+  bottom: 118px;
+  z-index: 140;
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(205, 174, 176, 0.76);
+  color: rgba(255, 250, 250, 0.96);
+  box-shadow: 0 10px 28px rgba(95, 72, 76, 0.18);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  cursor: var(--cursor-pointer);
+}
+
+.music-button.playing {
+  opacity: 0.68;
+}
   </style>
 </head>
 
 <body>
   <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
   <main class="app">
+   <button id="musicButton" class="music-button" type="button">♪ 开启音乐</button>
     <div class="soft-noise"></div>
 
     <section class="page active" id="passwordPage">
@@ -1865,17 +1984,22 @@
     </div>
   </main>
 <div class="modal-mask" id="cameraModal">
-  <div class="modal-card camera-card">
-    <div class="window-head">
-      <span class="window-title">CAMERA / PRIVATE</span>
-      <button class="window-close" data-close="cameraModal" type="button">×</button>
+  <div class="camera-window">
+    <div class="camera-window-bar">
+      <div class="camera-bar-left">
+        <span class="camera-title">实时画面</span>
+        <span class="camera-dot"></span>
+        <span class="camera-status">录制中：</span>
+        <span class="camera-time" id="cameraLiveTime">00:00:00</span>
+      </div>
+      <button class="camera-close" data-close="cameraModal" type="button">×</button>
     </div>
 
-   <div class="camera-photo-list">
-  <img src="camera-1.jpg" alt="记录照片一">
-  <img src="camera-2.jpg" alt="记录照片二">
-  <img src="camera-3.jpg" alt="记录照片三">
-</div>
+    <div class="camera-screen">
+      <img id="cameraImage" src="camera-1.jpg" alt="实时画面">
+    </div>
+
+    <div class="camera-hint">点击画面切换下一张记录</div>
   </div>
 </div>
 <div class="modal-mask" id="strawberryRecordModal">
@@ -1993,15 +2117,33 @@
     const bgm = document.querySelector("#bgm");
     let bgmStarted = false;
 
-    function startBgm() {
-      if (!bgm || bgmStarted) return;
-      bgm.volume = 0.35;
-      bgm.play().then(() => {
-        bgmStarted = true;
-      }).catch(() => {
-        console.log("音乐需要用户点击后播放");
-      });
+ const musicButton = document.querySelector("#musicButton");
+
+function startBgm() {
+  if (!bgm || bgmStarted) return;
+
+  bgm.volume = 0.35;
+
+  bgm.play().then(() => {
+    bgmStarted = true;
+    if (musicButton) {
+      musicButton.textContent = "♪ 音乐播放中";
+      musicButton.classList.add("playing");
     }
+  }).catch(() => {
+    if (musicButton) {
+      musicButton.textContent = "♪ 点我开启音乐";
+    }
+  });
+}
+
+if (musicButton) {
+  musicButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    startBgm();
+  });
+}
 
     const pages = document.querySelectorAll(".page");
     const passwordInput = document.querySelector("#passwordInput");
@@ -2018,9 +2160,14 @@
       return `${hours}:${minutes}:${seconds}`;
     }
 
-    setInterval(() => {
-      if (sessionTime) sessionTime.textContent = formatSessionTime(Date.now() - sessionStart);
-    }, 1000);
+   setInterval(() => {
+  const nowText = formatSessionTime(Date.now() - sessionStart);
+
+  if (sessionTime) sessionTime.textContent = nowText;
+
+  const cameraLiveTimeNow = document.querySelector("#cameraLiveTime");
+  if (cameraLiveTimeNow) cameraLiveTimeNow.textContent = nowText;
+}, 1000);
 
     const pageNames = {
       passwordPage: "暗号",
@@ -2465,8 +2612,52 @@ document.querySelector("#closeStrawberryFinal").addEventListener("click", () => 
       lockMessage.classList.add("active");
       document.querySelector("#chaosFinal").classList.add("active");
     });
-  const sessionCamera = document.querySelector("#sessionCamera");
+const sessionCamera = document.querySelector("#sessionCamera");
 const cameraModal = document.querySelector("#cameraModal");
+const cameraImage = document.querySelector("#cameraImage");
+const cameraLiveTime = document.querySelector("#cameraLiveTime");
+
+const cameraImages = [
+  "images/camera-1.jpg",
+  "images/camera-2.jpg",
+  "images/camera-3.jpg"
+];
+
+let cameraIndex = 0;
+
+function showCameraImage(index) {
+  if (!cameraImage) return;
+
+  cameraImage.style.animation = "none";
+  cameraImage.offsetHeight;
+  cameraImage.src = cameraImages[index];
+  cameraImage.style.animation = "";
+}
+
+if (sessionCamera && cameraModal) {
+  sessionCamera.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    cameraIndex = 0;
+    showCameraImage(cameraIndex);
+    if (cameraLiveTime && sessionTime) {
+      cameraLiveTime.textContent = sessionTime.textContent;
+    }
+
+    cameraModal.classList.add("active");
+  });
+}
+
+if (cameraImage) {
+  cameraImage.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    cameraIndex = (cameraIndex + 1) % cameraImages.length;
+    showCameraImage(cameraIndex);
+  });
+}
 
 if (sessionCamera && cameraModal) {
   sessionCamera.addEventListener("click", (event) => {
