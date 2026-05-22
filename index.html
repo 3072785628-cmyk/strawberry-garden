@@ -1112,50 +1112,49 @@
     }
 
 
-/* ===== 监控窗口最终清理版：无底部空白 / 深绿横栏 / 点击切换 ===== */
+/* ===== 监控弹窗干净稳定版 ===== */
 #cameraModal {
-  background: rgba(30, 45, 40, 0.72) !important;
+  padding: 22px !important;
+  background: rgba(30, 45, 40, 0.68) !important;
   backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  padding: 28px !important;
   align-items: center !important;
   justify-content: center !important;
   overflow: auto !important;
 }
 
 .camera-window {
-  width: min(78vw, 760px) !important;
-  max-width: 760px !important;
-  max-height: 86vh !important;
-  height: auto !important;
-  background: rgba(246, 243, 238, 0.98) !important;
-  border: 7px solid rgba(241, 236, 231, 0.98) !important;
-  box-shadow: 0 24px 74px rgba(0, 0, 0, 0.38) !important;
+  width: min(92vw, 860px) !important;
+  height: min(78vh, 620px) !important;
+  max-width: 860px !important;
+  max-height: 620px !important;
+  background: rgba(246, 239, 235, 0.96) !important;
+  border: 7px solid rgba(246, 239, 235, 0.96) !important;
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34) !important;
+  position: relative !important;
   display: flex !important;
   flex-direction: column !important;
-  position: relative !important;
 }
 
 .camera-window-bar {
   height: 38px !important;
   flex: 0 0 38px !important;
-  background: var(--green-dark) !important;
-  border: 2px solid rgba(38, 51, 47, 0.86) !important;
+  background: #5a7068 !important;
+  border: 2px solid rgba(45, 64, 58, 0.92) !important;
   border-bottom: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 0 6px 0 14px !important;
-  color: rgba(246, 239, 235, 0.92) !important;
+  gap: 8px !important;
+  padding: 0 6px 0 12px !important;
 }
 
 .camera-bar-left {
+  min-width: 0 !important;
   display: flex !important;
   align-items: center !important;
-  gap: 7px !important;
-  min-width: 0 !important;
-  font-size: 15px !important;
-  letter-spacing: 0.08em !important;
+  gap: 6px !important;
+  font-size: 13px !important;
+  letter-spacing: 0.04em !important;
   font-weight: 500 !important;
   white-space: nowrap !important;
 }
@@ -1163,83 +1162,94 @@
 .camera-title,
 .camera-status,
 .camera-time {
-  color: rgba(246, 239, 235, 0.88) !important;
-  text-shadow: 1px 1px rgba(30, 45, 40, 0.42) !important;
+  color: rgba(246, 239, 235, 0.96) !important;
+  text-shadow: 0 1px 0 rgba(45, 64, 58, 0.35) !important;
 }
 
 .camera-dot {
-  width: 13px !important;
-  height: 13px !important;
-  flex: 0 0 13px !important;
+  width: 11px !important;
+  height: 11px !important;
+  flex: 0 0 11px !important;
   border-radius: 50% !important;
   background: #f25a22 !important;
-  box-shadow: 0 0 10px rgba(242, 90, 34, 0.82) !important;
+  box-shadow: 0 0 10px rgba(242, 90, 34, 0.74) !important;
   animation: cameraDotBlink 1s ease-in-out infinite !important;
 }
 
 @keyframes cameraDotBlink {
-  0%, 100% {
-    opacity: 0.35;
-    transform: scale(0.86);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  0%, 100% { opacity: 0.35; transform: scale(0.86); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.camera-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+}
+
+.camera-next {
+  height: 28px !important;
+  padding: 0 10px !important;
+  border: 2px solid rgba(45, 64, 58, 0.92) !important;
+  background: rgba(246, 239, 235, 0.88) !important;
+  color: #2d403a !important;
+  font-size: 12px !important;
+  letter-spacing: 0.08em !important;
+  cursor: var(--cursor-pointer) !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 .camera-close {
-  width: 31px !important;
-  height: 31px !important;
-  flex: 0 0 31px !important;
-  border: 2px solid rgba(38, 51, 47, 0.86) !important;
+  width: 28px !important;
+  height: 28px !important;
+  border: 2px solid rgba(45, 64, 58, 0.92) !important;
   background: #e9b6ae !important;
-  color: rgba(45, 64, 58, 0.95) !important;
-  font-size: 22px !important;
+  color: #2d403a !important;
+  font-size: 20px !important;
   line-height: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
   cursor: var(--cursor-pointer) !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 .camera-screen {
-  width: 100% !important;
-  height: auto !important;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
-  max-height: calc(86vh - 52px) !important;
-  padding: 10px !important;
-  background: rgba(255, 255, 255, 0.54) !important;
-  border: 2px solid rgba(38, 51, 47, 0.86) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 2px solid rgba(45, 64, 58, 0.92) !important;
+  background: rgba(255, 255, 255, 0.62) !important;
   overflow: hidden !important;
-  display: block !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
 }
 
 .camera-screen img,
 #cameraImage {
   width: 100% !important;
-  height: auto !important;
+  height: 100% !important;
   max-width: 100% !important;
-  max-height: calc(86vh - 78px) !important;
-  object-fit: contain !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
   display: block !important;
+  border: 0 !important;
+  outline: none !important;
   cursor: var(--cursor-pointer) !important;
-  -webkit-tap-highlight-color: transparent !important;
   user-select: none !important;
   -webkit-user-select: none !important;
+  -webkit-user-drag: none !important;
   -webkit-touch-callout: none !important;
-  outline: none !important;
-  border: 0 !important;
+  -webkit-tap-highlight-color: transparent !important;
   touch-action: manipulation !important;
-  animation: cameraImagePop 220ms ease !important;
 }
 
-#cameraImage:focus,
+.camera-screen img:active,
 #cameraImage:active,
-.camera-screen:focus,
-.camera-screen:active {
+.camera-screen img:focus,
+#cameraImage:focus {
   outline: none !important;
-  background: transparent !important;
   -webkit-tap-highlight-color: transparent !important;
 }
 
@@ -1247,72 +1257,48 @@
   display: none !important;
 }
 
-@keyframes cameraImagePop {
-  from {
-    opacity: 0;
-    transform: scale(0.985);
-    filter: blur(1px);
+@media (min-width: 1101px) {
+  .camera-window {
+    width: min(86vw, 980px) !important;
+    height: min(82vh, 700px) !important;
+    max-width: 980px !important;
+    max-height: 700px !important;
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0);
+
+  #cameraModal {
+    padding: 36px !important;
   }
 }
 
-/* iPad / 平板 */
 @media (min-width: 701px) and (max-width: 1100px) {
+  .camera-window {
+    width: min(86vw, 760px) !important;
+    height: min(72vh, 540px) !important;
+    max-width: 760px !important;
+    max-height: 540px !important;
+  }
+
   #cameraModal {
     padding: 34px !important;
   }
-
-  .camera-window {
-    width: min(76vw, 660px) !important;
-    max-width: 660px !important;
-    max-height: 82vh !important;
-    border-width: 7px !important;
-  }
-
-  .camera-window-bar {
-    height: 36px !important;
-    flex-basis: 36px !important;
-  }
-
-  .camera-bar-left {
-    font-size: 13px !important;
-    gap: 6px !important;
-  }
-
-  .camera-screen {
-    max-height: calc(82vh - 50px) !important;
-    padding: 9px !important;
-  }
-
-  .camera-screen img,
-  #cameraImage {
-    max-height: calc(82vh - 74px) !important;
-  }
 }
 
-/* 手机端：去掉底部空白，贴近老师截图的比例 */
 @media (max-width: 700px) {
   #cameraModal {
-    padding: 22px 16px !important;
-    align-items: center !important;
+    padding: 18px !important;
   }
 
   .camera-window {
-    width: 88vw !important;
-    max-width: 88vw !important;
-    height: auto !important;
-    max-height: 78vh !important;
+    width: 92vw !important;
+    height: 64vh !important;
+    max-height: 520px !important;
     border-width: 6px !important;
   }
 
   .camera-window-bar {
     height: 34px !important;
-    flex: 0 0 34px !important;
-    padding: 0 5px 0 9px !important;
+    flex-basis: 34px !important;
+    padding: 0 5px 0 8px !important;
   }
 
   .camera-bar-left {
@@ -1322,41 +1308,24 @@
   }
 
   .camera-dot {
-    width: 10px !important;
-    height: 10px !important;
-    flex-basis: 10px !important;
+    width: 9px !important;
+    height: 9px !important;
+    flex-basis: 9px !important;
+  }
+
+  .camera-next {
+    height: 26px !important;
+    padding: 0 8px !important;
+    font-size: 10px !important;
   }
 
   .camera-close {
-    width: 28px !important;
-    height: 28px !important;
-    flex-basis: 28px !important;
-    font-size: 19px !important;
-  }
-
-  .camera-screen {
-    padding: 8px !important;
-    max-height: calc(78vh - 46px) !important;
-  }
-
-  .camera-screen img,
-  #cameraImage {
-    max-height: calc(78vh - 64px) !important;
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 18px !important;
   }
 }
 
-/* 特别窄的手机：让顶部不挤爆 */
-@media (max-width: 390px) {
-  .camera-bar-left {
-    font-size: 9px !important;
-    gap: 3px !important;
-  }
-
-  .camera-window {
-    width: 90vw !important;
-    max-width: 90vw !important;
-  }
-}
 
 .diary-read-image {
   width: 100%;
@@ -1459,8 +1428,7 @@
 .strawberry-final-card p {
   color: var(--muted);
 }
-  
-/* ===== 音乐按钮：给 Safari / iPad 手动开启 ===== */
+
 .music-button {
   position: fixed;
   right: 18px;
@@ -1476,6 +1444,7 @@
   font-size: 12px;
   letter-spacing: 0.12em;
   cursor: var(--cursor-pointer);
+  pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -1483,21 +1452,11 @@
   opacity: 0.68;
 }
 
-@media (max-width: 700px) {
-  .music-button {
-    right: 16px;
-    bottom: 112px;
-    height: 32px;
-    padding: 0 12px;
-    font-size: 11px;
-  }
-}
-
 </style>
 </head>
 
 <body>
-  <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+  <audio id="bgm" src="bgm.mp3" loop preload="auto" playsinline></audio>
   <main class="app">
    <button id="musicButton" class="music-button" type="button">♪ 开启音乐</button>
     <div class="soft-noise"></div>
@@ -1950,14 +1909,18 @@
         <span class="camera-time" id="cameraLiveTime">00:00:00</span>
       </div>
 
-      <button class="camera-close" id="cameraClose" type="button">×</button>
+      <div class="camera-actions">
+        <button class="camera-next" id="cameraNext" type="button">下一张</button>
+        <button class="camera-close" id="cameraClose" type="button">×</button>
+      </div>
     </div>
 
-    <div class="camera-screen">
-      <img id="cameraImage" src="camera-1.jpg" alt="实时画面">
+    <div class="camera-screen" id="cameraScreen">
+      <img id="cameraImage" src="camera-1.jpg" alt="实时画面" draggable="false">
     </div>
   </div>
 </div>
+
 <div class="modal-mask" id="strawberryRecordModal">
   <div class="modal-card strawberry-detail-card">
     <div class="window-head">
@@ -2071,35 +2034,43 @@
   <script>
     const PASSWORD = "00022414";
     const bgm = document.querySelector("#bgm");
+    const musicButton = document.querySelector("#musicButton");
     let bgmStarted = false;
 
- const musicButton = document.querySelector("#musicButton");
+    async function startBgm(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
 
-function startBgm() {
-  if (!bgm || bgmStarted) return;
+      if (!bgm) return;
 
-  bgm.volume = 0.35;
+      try {
+        bgm.src = "bgm.mp3";
+        bgm.loop = true;
+        bgm.preload = "auto";
+        bgm.volume = 0.45;
+        bgm.muted = false;
+        await bgm.play();
+        bgmStarted = true;
 
-  bgm.play().then(() => {
-    bgmStarted = true;
-    if (musicButton) {
-      musicButton.textContent = "♪ 音乐播放中";
-      musicButton.classList.add("playing");
+        if (musicButton) {
+          musicButton.textContent = "♪ 音乐播放中";
+          musicButton.classList.add("playing");
+        }
+      } catch (error) {
+        if (musicButton) {
+          musicButton.textContent = "♪ 再点一次开启音乐";
+          musicButton.classList.remove("playing");
+        }
+        console.log("音乐播放失败：", error);
+      }
     }
-  }).catch(() => {
-    if (musicButton) {
-      musicButton.textContent = "♪ 点我开启音乐";
-    }
-  });
-}
 
-if (musicButton) {
-  musicButton.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    startBgm();
-  });
-}
+    if (musicButton) {
+      musicButton.addEventListener("click", startBgm);
+      musicButton.addEventListener("touchend", startBgm, { passive: false });
+    }
 
     const pages = document.querySelectorAll(".page");
     const passwordInput = document.querySelector("#passwordInput");
@@ -2568,65 +2539,96 @@ document.querySelector("#closeStrawberryFinal").addEventListener("click", () => 
       lockMessage.classList.add("active");
       document.querySelector("#chaosFinal").classList.add("active");
     });
-
     const sessionCamera = document.querySelector("#sessionCamera");
     const cameraModal = document.querySelector("#cameraModal");
     const cameraImage = document.querySelector("#cameraImage");
+    const cameraScreen = document.querySelector("#cameraScreen");
+    const cameraNext = document.querySelector("#cameraNext");
     const cameraClose = document.querySelector("#cameraClose");
     const cameraLiveTime = document.querySelector("#cameraLiveTime");
 
-    const cameraImages = [
-      "camera-1.jpg",
-      "camera-2.jpg",
-      "camera-3.jpg"
-    ];
-
+    const cameraImages = ["camera-1.jpg", "camera-2.jpg", "camera-3.jpg"];
     let cameraIndex = 0;
 
-    function showCameraImage(index) {
+    function setCameraImage(index) {
       if (!cameraImage) return;
-
       cameraImage.style.animation = "none";
       cameraImage.offsetHeight;
       cameraImage.src = cameraImages[index];
-      cameraImage.style.animation = "";
+      cameraImage.style.animation = "cameraImagePop 220ms ease";
     }
 
-    if (sessionCamera && cameraModal) {
-      sessionCamera.onclick = (event) => {
+    function openCamera(event) {
+      if (event) {
         event.preventDefault();
         event.stopPropagation();
+      }
 
-        cameraIndex = 0;
-        showCameraImage(cameraIndex);
+      cameraIndex = 0;
+      setCameraImage(cameraIndex);
 
-        if (cameraLiveTime && sessionTime) {
-          cameraLiveTime.textContent = sessionTime.textContent;
-        }
+      if (cameraLiveTime && sessionTime) {
+        cameraLiveTime.textContent = sessionTime.textContent;
+      }
 
+      if (cameraModal) {
         cameraModal.classList.add("active");
-      };
+      }
+    }
+
+    function nextCameraImage(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      cameraIndex = (cameraIndex + 1) % cameraImages.length;
+      setCameraImage(cameraIndex);
+    }
+
+    function closeCamera(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      if (cameraModal) {
+        cameraModal.classList.remove("active");
+      }
+    }
+
+    if (sessionCamera) {
+      sessionCamera.addEventListener("click", openCamera);
+      sessionCamera.addEventListener("touchend", openCamera, { passive: false });
     }
 
     if (cameraImage) {
-      cameraImage.onclick = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        cameraIndex = (cameraIndex + 1) % cameraImages.length;
-        showCameraImage(cameraIndex);
-      };
+      cameraImage.addEventListener("click", nextCameraImage);
+      cameraImage.addEventListener("touchend", nextCameraImage, { passive: false });
     }
 
-    if (cameraClose && cameraModal) {
-      cameraClose.onclick = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        cameraModal.classList.remove("active");
-      };
+    if (cameraScreen) {
+      cameraScreen.addEventListener("click", nextCameraImage);
+      cameraScreen.addEventListener("touchend", nextCameraImage, { passive: false });
     }
 
-document.querySelector("#secretTriggerOne").addEventListener("click", () => {
+    if (cameraNext) {
+      cameraNext.addEventListener("click", nextCameraImage);
+      cameraNext.addEventListener("touchend", nextCameraImage, { passive: false });
+    }
+
+    if (cameraClose) {
+      cameraClose.addEventListener("click", closeCamera);
+      cameraClose.addEventListener("touchend", closeCamera, { passive: false });
+    }
+
+    setInterval(() => {
+      if (cameraLiveTime && sessionTime) {
+        cameraLiveTime.textContent = sessionTime.textContent;
+      }
+    }, 1000);
+
+    document.querySelector("#secretTriggerOne").addEventListener("click", () => {
       document.querySelector("#secretModalOne").classList.add("active");
     });
 
