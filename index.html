@@ -1533,6 +1533,166 @@
 .music-button.playing {
   opacity: 0.68;
 }
+/* ===== 监控弹窗最终版：根目录照片路径 ===== */
+#cameraModal {
+  background: rgba(30, 45, 40, 0.72);
+  backdrop-filter: blur(8px);
+  padding: 14px;
+}
+
+.camera-window {
+  width: min(96vw, 1120px);
+  height: min(88vh, 760px);
+  background: rgba(246, 239, 235, 0.96);
+  border: 10px solid rgba(246, 239, 235, 0.96);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.camera-window-bar {
+  height: 42px;
+  flex: 0 0 42px;
+  background: #83c9bd;
+  border: 2px solid rgba(38, 51, 47, 0.76);
+  border-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px 0 16px;
+  color: rgba(38, 51, 47, 0.86);
+}
+
+.camera-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.camera-title,
+.camera-status,
+.camera-time {
+  color: rgba(31, 107, 77, 0.96);
+  text-shadow: 1px 1px rgba(175, 142, 143, 0.65);
+}
+
+.camera-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff4a18;
+  box-shadow: 0 0 12px rgba(255, 74, 24, 0.88);
+  animation: cameraDotBlink 1s ease-in-out infinite;
+}
+
+@keyframes cameraDotBlink {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.86);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.camera-close {
+  width: 34px;
+  height: 34px;
+  border: 2px solid rgba(38, 51, 47, 0.76);
+  background: #f0a093;
+  color: rgba(38, 51, 47, 0.9);
+  font-size: 24px;
+  line-height: 1;
+  cursor: var(--cursor-pointer);
+}
+
+.camera-screen {
+  flex: 1;
+  min-height: 0;
+  border: 2px solid rgba(38, 51, 47, 0.76);
+  background: rgba(255, 255, 255, 0.66);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  cursor: var(--cursor-pointer);
+  animation: cameraImagePop 260ms ease;
+}
+
+@keyframes cameraImagePop {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(1px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+.camera-hint {
+  position: absolute;
+  left: 18px;
+  bottom: 14px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(246, 239, 235, 0.76);
+  color: rgba(38, 51, 47, 0.56);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .camera-window {
+    width: 96vw;
+    height: 78vh;
+    border-width: 7px;
+  }
+
+  .camera-window-bar {
+    height: 38px;
+    flex-basis: 38px;
+    padding-left: 10px;
+  }
+
+  .camera-bar-left {
+    gap: 5px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  .camera-dot {
+    width: 12px;
+    height: 12px;
+  }
+
+  .camera-close {
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+  }
+
+  .camera-hint {
+    font-size: 10px;
+    bottom: 10px;
+    left: 12px;
+  }
+}
   </style>
 </head>
 
@@ -1994,7 +2154,7 @@
     </div>
 
     <div class="camera-screen">
-      <img id="cameraImage" src="images/camera-1 .jpg" alt="实时画面">
+      <img id="cameraImage" src="camera-1.jpg" alt="实时画面">
     </div>
 
     <div class="camera-hint">点击画面切换下一张记录</div>
@@ -2685,6 +2845,69 @@ if (cameraClose && cameraModal) {
         if (event.target === mask) mask.classList.remove("active");
       });
     });
+/* ===== 监控弹窗最终版：根目录照片路径 ===== */
+const monitorButtonFinal = document.querySelector("#sessionCamera");
+const monitorModalFinal = document.querySelector("#cameraModal");
+const monitorImageFinal = document.querySelector("#cameraImage");
+const monitorCloseFinal = document.querySelector("#cameraClose");
+const monitorLiveTimeFinal = document.querySelector("#cameraLiveTime");
+
+const monitorImagesFinal = [
+  "camera-1.jpg",
+  "camera-2.jpg",
+  "camera-3.jpg"
+];
+
+let monitorIndexFinal = 0;
+
+function showMonitorImageFinal(index) {
+  if (!monitorImageFinal) return;
+
+  monitorImageFinal.style.animation = "none";
+  monitorImageFinal.offsetHeight;
+  monitorImageFinal.src = monitorImagesFinal[index];
+  monitorImageFinal.style.animation = "";
+}
+
+if (monitorButtonFinal && monitorModalFinal) {
+  monitorButtonFinal.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    monitorIndexFinal = 0;
+    showMonitorImageFinal(monitorIndexFinal);
+
+    if (monitorLiveTimeFinal && sessionTime) {
+      monitorLiveTimeFinal.textContent = sessionTime.textContent;
+    }
+
+    monitorModalFinal.classList.add("active");
+  });
+}
+
+if (monitorImageFinal) {
+  monitorImageFinal.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    monitorIndexFinal = (monitorIndexFinal + 1) % monitorImagesFinal.length;
+    showMonitorImageFinal(monitorIndexFinal);
+  });
+}
+
+if (monitorCloseFinal && monitorModalFinal) {
+  monitorCloseFinal.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    monitorModalFinal.classList.remove("active");
+  });
+}
+
+setInterval(() => {
+  if (monitorLiveTimeFinal && sessionTime) {
+    monitorLiveTimeFinal.textContent = sessionTime.textContent;
+  }
+}, 1000);
   </script>
 </body>
 </html>
