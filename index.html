@@ -1693,6 +1693,41 @@
     left: 12px;
   }
 }
+  /* ===== 监控窗口尺寸微调：不要铺太满，露出边缘 ===== */
+#cameraModal {
+  padding: 38px;
+}
+
+.camera-window {
+  width: min(88vw, 920px);
+  height: min(76vh, 620px);
+}
+
+.camera-screen {
+  padding: 18px;
+}
+
+.camera-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 手机端也稍微收一点 */
+@media (max-width: 700px) {
+  #cameraModal {
+    padding: 24px;
+  }
+
+  .camera-window {
+    width: 90vw;
+    height: 68vh;
+  }
+
+  .camera-screen {
+    padding: 12px;
+  }
+}
   </style>
 </head>
 
